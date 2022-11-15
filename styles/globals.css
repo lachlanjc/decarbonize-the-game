@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'MD Primer';
+  font-style: normal;
+  font-weight: 400;
+  src: url('https://solar-optimism-8rsxvn4gn-lachlanjc.vercel.app/md-primer/regular.woff2')
+      format('woff2'),
+    url('https://solar-optimism-8rsxvn4gn-lachlanjc.vercel.app/md-primer/regular.woff')
+      format('woff');
+}
+
+@font-face {
+  font-family: 'MD Primer';
+  font-style: normal;
+  font-weight: 700;
+  src: url('https://solar-optimism-8rsxvn4gn-lachlanjc.vercel.app/md-primer/bold.woff2')
+      format('woff2'),
+    url('https://solar-optimism-8rsxvn4gn-lachlanjc.vercel.app/md-primer/bold.woff')
+      format('woff');
+}
