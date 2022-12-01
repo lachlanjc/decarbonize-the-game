@@ -6,8 +6,6 @@ specifiers:
   '@types/node': 18.11.9
   '@types/react': 18.0.25
   '@types/react-dom': 18.0.9
-  '@types/topojson-client': ^3.1.1
-  '@visx/geo': ^2.10.0
   autoprefixer: ^10.4.13
   clsx: ^1.2.1
   framer-motion: ^7.6.6
@@ -15,24 +13,23 @@ specifiers:
   next: latest
   postcss: ^8.4.19
   react: 18.2.0
+  react-bootstrap-icons: ^1.10.2
   react-dom: 18.2.0
   recharts: ^2.1.16
   tailwindcss: ^3.2.4
-  topojson-client: ^3.1.0
   typescript: 4.8.4
   zustand: ^4.1.4
 
 dependencies:
   '@next/font': 13.0.5
-  '@visx/geo': 2.10.0_react@18.2.0
   clsx: 1.2.1
   framer-motion: 7.6.6_biqbaboplfbrettd7655fr4n2y
   lodash: 4.17.21
   next: 13.0.5_biqbaboplfbrettd7655fr4n2y
   react: 18.2.0
+  react-bootstrap-icons: 1.10.2_react@18.2.0
   react-dom: 18.2.0_react@18.2.0
   recharts: 2.1.16_biqbaboplfbrettd7655fr4n2y
-  topojson-client: 3.1.0
   zustand: 4.1.4_react@18.2.0
 
 devDependencies:
@@ -40,7 +37,6 @@ devDependencies:
   '@types/node': 18.11.9
   '@types/react': 18.0.25
   '@types/react-dom': 18.0.9
-  '@types/topojson-client': 3.1.1
   autoprefixer: 10.4.13_postcss@8.4.19
   postcss: 8.4.19
   tailwindcss: 3.2.4_postcss@8.4.19
@@ -271,12 +267,6 @@ packages:
     resolution: {integrity: sha512-+0EtEjBfKEDtH9Rk3u3kLOUXM5F+iZK+WvASPb0MhIZl8J8NUvGeZRwKCXl+P3HkYx5TdU4YtcibpqHkSR9n7w==}
     dev: false
 
-  /@types/d3-geo/1.12.3:
-    resolution: {integrity: sha512-yZbPb7/5DyL/pXkeOmZ7L5ySpuGr4H48t1cuALjnJy5sXQqmSSAYBiwa6Ya/XpWKX2rJqGDDubmh3nOaopOpeA==}
-    dependencies:
-      '@types/geojson': 7946.0.10
-    dev: false
-
   /@types/d3-interpolate/2.0.2:
     resolution: {integrity: sha512-lElyqlUfIPyWG/cD475vl6msPL4aMU7eJvx1//Q177L8mdXoVPFl1djIESF2FKnc0NyaHvQlJpWwKJYwAhUoCw==}
     dependencies:
@@ -303,9 +293,6 @@ packages:
     resolution: {integrity: sha512-9MVYlmIgmRR31C5b4FVSWtuMmBHh2mOWQYfl7XAYOa8dsnb7iEmUmRSWSFgXFtkjxO65d7hTUHQC+RhR/9IWFg==}
     dev: false
 
-  /@types/geojson/7946.0.10:
-    resolution: {integrity: sha512-Nmh0K3iWQJzniTuPRcJn5hxXkfB1T1pgB89SBig5PlJQU5yocazeu4jATJlaA0GYFKWMqDdvYemoSnF2pXgLVA==}
-
   /@types/lodash/4.14.189:
     resolution: {integrity: sha512-kb9/98N6X8gyME9Cf7YaqIMvYGnBSWqEci6tiettE6iJWH1XdJz/PO8LB0GtLCG7x8dU3KWhZT+lA1a35127tA==}
     dev: true
@@ -316,6 +303,7 @@ packages:
 
   /@types/prop-types/15.7.5:
     resolution: {integrity: sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==}
+    dev: true
 
   /@types/react-dom/18.0.9:
     resolution: {integrity: sha512-qnVvHxASt/H7i+XG1U1xMiY5t+IHcPGUK7TDMDzom08xa7e86eCeKOiLZezwCKVxJn6NEiiy2ekgX8aQssjIKg==}
@@ -329,48 +317,11 @@ packages:
       '@types/prop-types': 15.7.5
       '@types/scheduler': 0.16.2
       csstype: 3.1.1
+    dev: true
 
   /@types/scheduler/0.16.2:
     resolution: {integrity: sha512-hppQEBDmlwhFAXKJX2KnWLYu5yMfi91yazPb2l+lbJiwW+wdo1gNeRA+3RgNSO39WYX2euey41KEwnqesU2Jew==}
-
-  /@types/topojson-client/3.1.1:
-    resolution: {integrity: sha512-E4/Z2Xg56kVLRzYWem/6uOKVcVNqqxEqlWM9qCG2tCV1BxuzvvXC02/ELoGJWgtKkQhfycBPlMFEuTFdA/YiTg==}
-    dependencies:
-      '@types/geojson': 7946.0.10
-      '@types/topojson-specification': 1.0.2
     dev: true
-
-  /@types/topojson-specification/1.0.2:
-    resolution: {integrity: sha512-SGc1NdX9g3UGDp6S+p+uyG+Z8CehS51sUJ9bejA25Xgn2kkAguILk6J9nxXK+0M/mbTBN7ypMA7+4HVLNMJ8ag==}
-    dependencies:
-      '@types/geojson': 7946.0.10
-    dev: true
-
-  /@visx/geo/2.10.0_react@18.2.0:
-    resolution: {integrity: sha512-YdhHagNQw0pW1jgLcEgqEqzXwfYQy0Y1UDeM96qZnM8Ki8/nGYGB2A5wnZO27mp290HnmYgmRJNpAEjp7erlTw==}
-    peerDependencies:
-      react: ^16.3.0-0 || ^17.0.0-0 || ^18.0.0-0
-    dependencies:
-      '@types/d3-geo': 1.12.3
-      '@types/geojson': 7946.0.10
-      '@types/react': 18.0.25
-      '@visx/group': 2.10.0_react@18.2.0
-      classnames: 2.3.2
-      d3-geo: 1.12.1
-      prop-types: 15.8.1
-      react: 18.2.0
-    dev: false
-
-  /@visx/group/2.10.0_react@18.2.0:
-    resolution: {integrity: sha512-DNJDX71f65Et1+UgQvYlZbE66owYUAfcxTkC96Db6TnxV221VKI3T5l23UWbnMzwFBP9dR3PWUjjqhhF12N5pA==}
-    peerDependencies:
-      react: ^16.0.0-0 || ^17.0.0-0 || ^18.0.0-0
-    dependencies:
-      '@types/react': 18.0.25
-      classnames: 2.3.2
-      prop-types: 15.8.1
-      react: 18.2.0
-    dev: false
 
   /acorn-node/1.8.2:
     resolution: {integrity: sha512-8mt+fslDufLYntIoPAaIMUe/lrbrehIiwmR3t2k9LljIzoigEPF27eLk2hy8zSGzmR/ogr7zbRKINMo1u0yh5A==}
@@ -482,10 +433,6 @@ packages:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
     dev: true
 
-  /commander/2.20.3:
-    resolution: {integrity: sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==}
-    dev: false
-
   /css-unit-converter/1.1.2:
     resolution: {integrity: sha512-IiJwMC8rdZE0+xiEZHeru6YoONC4rfPMqGm2W85jMIbkFvv5nFTwJVFHam2eFrN6txmoUYFAFXiv8ICVeTO0MA==}
     dev: false
@@ -498,10 +445,7 @@ packages:
 
   /csstype/3.1.1:
     resolution: {integrity: sha512-DJR/VvkAvSZW9bTouZue2sSxDwdTN92uHjqeKVm+0dAqdfNykRzQ95tay8aXMBAAPpUiq4Qcug2L7neoRh2Egw==}
-
-  /d3-array/1.2.4:
-    resolution: {integrity: sha512-KHW6M86R+FUPYGb3R5XiYjXPq7VzwxZ22buHhAEVG5ztoEcZZMLov530mmccaqA1GghZArjQV46fuc8kUqhhHw==}
-    dev: false
+    dev: true
 
   /d3-array/2.12.1:
     resolution: {integrity: sha512-B0ErZK/66mHtEsR1TkPEEkwdy+WDesimkM5gpZr5Dsg54BiTA5RXtYW5qTLIAcekaS9xfZrzBLF/OAkB3Qn1YQ==}
@@ -515,12 +459,6 @@ packages:
 
   /d3-format/2.0.0:
     resolution: {integrity: sha512-Ab3S6XuE/Q+flY96HXT0jOXcM4EAClYFnRGY5zsjRGNy6qCYrQsMffs7cV5Q9xejb35zxW5hf/guKw34kvIKsA==}
-    dev: false
-
-  /d3-geo/1.12.1:
-    resolution: {integrity: sha512-XG4d1c/UJSEX9NfU02KwBL6BYPj8YKHxgBEw5om2ZnTRSbIcego6dhHwcxuSR3clxh0EpE38os1DVPOmnYtTPg==}
-    dependencies:
-      d3-array: 1.2.4
     dev: false
 
   /d3-interpolate/2.0.1:
@@ -969,6 +907,15 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
+  /react-bootstrap-icons/1.10.2_react@18.2.0:
+    resolution: {integrity: sha512-PC72g6uARdSxZH+ViBbul3FRWKuIhiJajahwt1h0daPBDw789KqpA+x3hrJpSUyQMF0PQ9LfWxu1a0O67bqPeg==}
+    peerDependencies:
+      react: '>=16.8.6'
+    dependencies:
+      prop-types: 15.8.1
+      react: 18.2.0
+    dev: false
+
   /react-dom/18.2.0_react@18.2.0:
     resolution: {integrity: sha512-6IMTriUmvsjHUjNtEDudZfuDQUoWXVxKHhlEGSk81n4YFS+r/Kl99wXiwlVXtPBtJenozv2P+hxDsw9eA7Xo6g==}
     peerDependencies:
@@ -1187,13 +1134,6 @@ packages:
     dependencies:
       is-number: 7.0.0
     dev: true
-
-  /topojson-client/3.1.0:
-    resolution: {integrity: sha512-605uxS6bcYxGXw9qi62XyrV6Q3xwbndjachmNxu8HWTtVPxZfEJN9fd/SZS1Q54Sn2y0TMyMxFj/cJINqGHrKw==}
-    hasBin: true
-    dependencies:
-      commander: 2.20.3
-    dev: false
 
   /tslib/2.4.0:
     resolution: {integrity: sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==}

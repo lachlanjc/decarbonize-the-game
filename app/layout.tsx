@@ -33,11 +33,7 @@ function Layout({ children }: PropsWithChildren<{}>) {
       className={clsx(relativePro.variable, relativeMono.variable)}
     >
       <head />
-      <body>
-        <main className="flex min-h-screen flex-col items-center justify-center">
-          {children}
-        </main>
-      </body>
+      <body>{children}</body>
     </html>
   )
 }
