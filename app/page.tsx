@@ -7,6 +7,7 @@ import Board from './board'
 import Capacity from './capacity'
 import { IconCoal, IconGas, IconWind, IconSolar } from './icons'
 import { ArrowRepeat, EmojiFrownFill } from 'react-bootstrap-icons'
+import useKeypress from 'react-use-keypress'
 
 // const sourceColors: Record<SourceName, string> = {
 //   solar: 'amber-400',
@@ -24,12 +25,16 @@ const sourceIcons: Record<SourceName, ReactNode> = {
 
 function Page() {
   const gameState = useGameState()
-  // @ts-expect-error
-  window.gameState = gameState
+  if (typeof document != null) {
+    // @ts-expect-error
+    window.gameState = gameState
+  }
 
   const isGameOver = gameState.isGameOver()
   const currentCapacity = gameState.getCurrentCapacity()
-  const isCapacityOver = (currentCapacity >= gameState.capacityGoal) && (gameState.capacityLastHit <= gameState.year - 5)
+  const isCapacityOver =
+    currentCapacity >= gameState.capacityGoal &&
+    gameState.capacityLastHit <= gameState.year - 5
 
   useEffect(() => {
     const yearTicker = setInterval(() => gameState.tickYear(), 1000)
@@ -37,6 +42,22 @@ function Page() {
       clearInterval(yearTicker)
     }
   }, [])
+
+  useKeypress('e', () => {
+    gameState.endGame()
+  })
+  useKeypress('a', () => {
+    gameState.purchase('solar')
+  })
+  useKeypress('s', () => {
+    gameState.purchase('wind')
+  })
+  useKeypress('d', () => {
+    gameState.purchase('coal')
+  })
+  useKeypress('f', () => {
+    gameState.purchase('gas')
+  })
 
   return (
     <main
