@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "@next/font": "^13.0.5",
+    "@steima/react-qr-barcode-scanner": "^1.1.2",
     "clsx": "^1.2.1",
     "framer-motion": "^7.6.6",
     "lodash": "^4.17.21",

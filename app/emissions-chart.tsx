@@ -16,7 +16,6 @@ function EmissionsChart({ emissions = {} }: { emissions: Data }) {
     value,
   }))
   const maxEmissions = Math.max(...Object.values(emissions))
-  console.log(emissions)
   return (
     <ResponsiveContainer
       width="100%"

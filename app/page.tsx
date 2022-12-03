@@ -8,6 +8,12 @@ import Capacity from './capacity'
 import { IconCoal, IconGas, IconWind, IconSolar } from './icons'
 import { ArrowRepeat, EmojiFrownFill } from 'react-bootstrap-icons'
 import useKeypress from 'react-use-keypress'
+import dynamic from 'next/dynamic'
+
+const BarcodeScanner = dynamic(
+  () => import('@steima/react-qr-barcode-scanner'),
+  { ssr: false }
+)
 
 // const sourceColors: Record<SourceName, string> = {
 //   solar: 'amber-400',
@@ -80,6 +86,26 @@ function Page() {
         )}{' '}
         tCO<sub>2</sub>
       </p>
+      <div className="absolute invisible">
+        <BarcodeScanner
+          onUpdate={(err, result) => {
+            if (result) {
+              const key = result.getText().toLowerCase()
+              if (Object.keys(sourceIcons).includes(key)) {
+                console.log('PURCHASING', key)
+                gameState.purchase(key as SourceName)
+              }
+            }
+            if (err) {
+              console.warn(err)
+            }
+          }}
+          width={1024}
+          height={768}
+          facingMode="user"
+          stopStream={isGameOver}
+        />
+      </div>
       {isGameOver ? (
         <>
           <button
