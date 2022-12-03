@@ -61,8 +61,9 @@ function Page() {
 
   return (
     <main
-      className={`flex full-width min-h-screen flex-col items-center justify-center relative transition-colors ${isGameOver ? 'bg-black' : 'bg-sky-500'
-        } text-white`}
+      className={`flex full-width min-h-screen flex-col items-center justify-center relative transition-colors ${
+        isGameOver ? 'bg-black' : 'bg-sky-500'
+      } text-white`}
     >
       <EmissionsChart emissions={gameState.emissions} />
       <Board installed={gameState.installed} />
@@ -74,7 +75,7 @@ function Page() {
         {gameState.year}
       </p>
       <p className="font-bold text-8xl relative proportional-nums">
-        {new Intl.NumberFormat('en-US').format(
+        {new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(
           gameState.getLifetimeEmissions()
         )}{' '}
         tCO<sub>2</sub>
@@ -104,10 +105,15 @@ function Page() {
             goalLastHit={gameState.capacityLastHit}
             currentYear={gameState.year}
           />
-          {isCapacityOver && <p className='absolute top-12 left-1/2 -translate-x-1/2 uppercase font-bold bg-red-500 text-white px-2 rounded-md'>Grid at capacity</p>}
-          <div className="grid grid-cols-4 gap-8 aria-disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:pointer-events-none" aria-disabled={
-            isCapacityOver
-          }>
+          {isCapacityOver && (
+            <p className="absolute top-12 left-1/2 -translate-x-1/2 uppercase font-bold bg-red-500 text-white px-2 rounded-md">
+              Grid at capacity
+            </p>
+          )}
+          <div
+            className="grid grid-cols-4 gap-8 aria-disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:pointer-events-none"
+            aria-disabled={isCapacityOver}
+          >
             {Object.entries(gameState.sources).map(([key, source]) => (
               <button
                 className="text-center flex flex-col items-center px-2 group cursor-pointer"
@@ -117,7 +123,13 @@ function Page() {
               >
                 {sourceIcons[key as SourceName] as ReactNode}
                 <strong className="font-bold capitalize mt-3">{key}</strong>
-                <p className="opacity-60 text-sm font-mono">${source.price}</p>
+                <p className="opacity-60 text-sm font-mono">
+                  {new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    maximumFractionDigits: 0,
+                  }).format(source.price)}
+                </p>
               </button>
             ))}
           </div>

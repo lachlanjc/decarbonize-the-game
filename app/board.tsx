@@ -9,16 +9,9 @@ const sourceIcons: Record<SourceName, ReactNode> = {
   gas: <IconGas className="fill-gray-800" size={48} />,
 }
 
-const sourceCols: Record<SourceName, number> = {
-  solar: 4,
-  wind: 2,
-  coal: 1,
-  gas: 1,
-}
-
 function Board({ installed }: Pick<State, 'installed'>) {
   return (
-    <div className="grid grid-cols-4 grid-rows-4 [grid-auto-flow:dense] gap-2 bg-sky-700 p-2 rounded-xl shadow-dock absolute top-8 right-8 aspect-square">
+    <div className="grid grid-cols-4 grid-rows-4 grid-flow-dense gap-2 bg-sky-700 p-2 rounded-xl shadow-dock absolute top-8 right-8 aspect-square">
       {installed
         .filter((source) => source.active)
         .map(({ source, price, size }, i) => (

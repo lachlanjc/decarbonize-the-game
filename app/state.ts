@@ -66,10 +66,10 @@ const initialState: State = {
     { source: 'wind', price: 0, co2Rate: 0, size: 2, active: true },
   ],
   sources: {
-    solar: { price: 100, co2Rate: 0, size: 4 },
-    wind: { price: 100, co2Rate: 0, size: 2 },
-    coal: { price: 100, co2Rate: 25, size: 1 },
-    gas: { price: 100, co2Rate: 15, size: 1 },
+    solar: { price: 83, co2Rate: 0, size: 4 },
+    wind: { price: 160, co2Rate: 0, size: 2 },
+    coal: { price: 350, co2Rate: 22.6, size: 1 },
+    gas: { price: 100, co2Rate: 9.7, size: 1 },
   },
   emissions: getInitialEmissions(),
 }
@@ -99,16 +99,23 @@ const useGameState = create<State & Actions>((set, get) => ({
 
   purchase: (srcName: SourceName) => {
     // console.log('PURCHASE', srcName)
-    const source = get().sources[srcName] as Source
+    const { sources } = get()
+    const source = sources[srcName] as Source
     source.source = srcName
     source.active = true
-    source.price = random(0, 100)
-    set(({ budget, installed }) => ({
-      budget: budget - source.price,
+
+    set(({ budget }) => ({ budget: budget - source.price }))
+
+    if (srcName === 'solar') {
+      const capacity = get().getLifetimeCapacityOfSource('solar')
+      const scaleFactor = capacity === 1 || capacity % 2 === 1 ? 0.8 : 1
+      const price = sources.solar.price * scaleFactor
+      set({ sources: { ...sources, solar: { ...sources.solar, price } } })
+    }
+
+    set(({ installed }) => ({
       installed: [...installed, source],
     }))
-    // TODO: source market feedback loop
-    get().getLifetimeCapacityOfSource(srcName)
   },
 
   decomission: (srcName: SourceName) => {
@@ -122,6 +129,9 @@ const useGameState = create<State & Actions>((set, get) => ({
     const { year, emissions, capacityGoal, isGameOver } = get()
     if (isGameOver()) return
     emissions[year] = get().getYearEmissions()
+    if (year + 1 === CONSTANTS.gameYearStart + CONSTANTS.gameYearSpan) {
+      set({ message: 'You made it to the end!' })
+    }
     set({ year: year + 1, emissions })
     if (get().getCurrentCapacity() >= capacityGoal) {
       set({ capacityLastHit: year, message: 'Capacity goal hit!' })
@@ -129,7 +139,7 @@ const useGameState = create<State & Actions>((set, get) => ({
       // capacity not hit
       set({ message: 'You didn’t provide enough electricity to meet demand.' })
     }
-    if (year % 5 === 0) {
+    if (year % 8 === 0) {
       set({ capacityGoal: capacityGoal + 1 })
     }
   },
