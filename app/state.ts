@@ -1,6 +1,7 @@
 import create from 'zustand'
+import { subscribeWithSelector } from 'zustand/middleware'
 import sum from 'lodash/sum'
-import random from 'lodash/random'
+import { cloneDeep } from 'lodash'
 
 export const CONSTANTS = {
   gameYearStart: 2022,
@@ -25,19 +26,19 @@ interface Source {
 
 // define types for state values and actions separately
 export type State = {
-  level: number
-  year: number
-  budget: number
-  capacityGoal: number
-  capacityLastHit: number
-  inGameMessage: {
+  readonly level: number
+  readonly year: number
+  readonly budget: number
+  readonly capacityGoal: number
+  readonly capacityLastHit: number
+  readonly inGameMessage: {
     text: string
     lastUpdated: number
   }
-  endGameMessage: string
-  installed: Array<Source>
-  sources: Record<SourceName, Omit<Source, 'source' | 'active'>>
-  emissions: Record<number, number>
+  readonly endGameMessage: string
+  readonly installed: Array<Source>
+  readonly sources: Record<SourceName, Omit<Source, 'source' | 'active'>>
+  readonly emissions: Record<number, number>
 }
 
 type Actions = {
@@ -113,7 +114,9 @@ const useGameState = create<State & Actions>((set, get) => ({
     // console.log('PURCHASE', srcName)
 
     if (get().installed.length >= CONSTANTS.maxInstalledSources) {
-      return set({ inGameMessage: 'The board is full.' })
+      return set(({ year }) => ({
+        inGameMessage: { text: 'The board is full.', lastUpdated: year },
+      }))
     }
 
     const { sources } = get()
@@ -143,7 +146,7 @@ const useGameState = create<State & Actions>((set, get) => ({
   },
 
   tickYear: () => {
-    const { emissions, capacityGoal, sources, isGameOver } = get()
+    const { capacityGoal, sources, isGameOver } = get()
     if (isGameOver()) return
 
     const year = get().year + 1
@@ -156,6 +159,7 @@ const useGameState = create<State & Actions>((set, get) => ({
     //   set({ inGameMessage: '' })
     // }
 
+    const emissions = structuredClone(get().emissions)
     emissions[year] = get().getYearEmissions()
     const addlBudget =
       Math.min(...Object.values(sources).map((src) => src.price)) * 0.7
@@ -186,7 +190,7 @@ const useGameState = create<State & Actions>((set, get) => ({
   },
 
   reset: () => {
-    initialState.emissions = getInitialEmissions()
+    // initialState.emissions = getInitialEmissions()
     set(initialState)
     console.log('initial emissions', initialState.emissions)
   },

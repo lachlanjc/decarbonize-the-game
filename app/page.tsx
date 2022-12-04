@@ -8,8 +8,9 @@ import Capacity from './capacity'
 import { IconCoal, IconGas, IconWind, IconSolar } from './icons'
 import { ArrowRepeat, EmojiFrownFill } from 'react-bootstrap-icons'
 import useKeypress from 'react-use-keypress'
-import dynamic from 'next/dynamic'
+import useSound from 'use-sound'
 
+import dynamic from 'next/dynamic'
 const BarcodeScanner = dynamic(() => import('./scanner'), { ssr: false })
 
 const sourceIcons: Record<SourceName, ReactNode> = {
@@ -32,8 +33,14 @@ function Page() {
     currentCapacity >= gameState.capacityGoal &&
     gameState.capacityLastHit <= gameState.year - 5
 
+  const [playPurchase] = useSound(
+    '/sounds/pop-up-off.mp3',
+    { volume: 0.5 }
+  )
+
   useEffect(() => {
     const yearTicker = setInterval(() => gameState.tickYear(), 1500)
+
     return () => {
       clearInterval(yearTicker)
     }
@@ -44,15 +51,19 @@ function Page() {
   })
   useKeypress('a', () => {
     gameState.purchase('solar')
+    playPurchase()
   })
   useKeypress('s', () => {
     gameState.purchase('wind')
+    playPurchase()
   })
   useKeypress('d', () => {
     gameState.purchase('coal')
+    playPurchase()
   })
   useKeypress('f', () => {
     gameState.purchase('gas')
+    playPurchase()
   })
 
   return (
@@ -70,7 +81,7 @@ function Page() {
       <p
         className="text-2xl absolute top-8 transition-opacity aria-hidden:opacity-0"
         aria-live='assertive'
-        aria-hidden={gameState.inGameMessage.lastUpdated <= gameState.year - 2}
+        aria-hidden={gameState.inGameMessage.lastUpdated <= gameState.year - 3}
       >
         {gameState.inGameMessage.text}
       </p>
