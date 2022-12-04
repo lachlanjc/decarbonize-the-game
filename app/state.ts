@@ -149,6 +149,7 @@ const useGameState = create<State & Actions>((set, get) => ({
   },
 
   reset: () => {
+    initialState.emissions = getInitialEmissions()
     set(initialState)
     console.log('initial emissions', initialState.emissions)
   },

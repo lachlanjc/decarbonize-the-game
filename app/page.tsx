@@ -10,17 +10,7 @@ import { ArrowRepeat, EmojiFrownFill } from 'react-bootstrap-icons'
 import useKeypress from 'react-use-keypress'
 import dynamic from 'next/dynamic'
 
-const BarcodeScanner = dynamic(
-  () => import('@steima/react-qr-barcode-scanner'),
-  { ssr: false }
-)
-
-// const sourceColors: Record<SourceName, string> = {
-//   solar: 'amber-400',
-//   wind: 'sky-500',
-//   coal: 'black',
-//   gas: 'yellow-900',
-// }
+const BarcodeScanner = dynamic(() => import('./scanner'), { ssr: false })
 
 const sourceIcons: Record<SourceName, ReactNode> = {
   solar: <IconSolar className="fill-amber-300" size={52} />,
@@ -86,26 +76,24 @@ function Page() {
         )}{' '}
         tCO<sub>2</sub>
       </p>
-      <div className="absolute invisible">
-        <BarcodeScanner
-          onUpdate={(err, result) => {
-            if (result) {
-              const key = result.getText().toLowerCase()
-              if (Object.keys(sourceIcons).includes(key)) {
-                console.log('PURCHASING', key)
-                gameState.purchase(key as SourceName)
-              }
+      <BarcodeScanner
+        onUpdate={(err, result) => {
+          if (result) {
+            const key = result.getText().toLowerCase()
+            if (Object.keys(sourceIcons).includes(key)) {
+              console.log('PURCHASING', key)
+              gameState.purchase(key as SourceName)
             }
-            if (err) {
-              console.warn(err)
-            }
-          }}
-          width={1024}
-          height={768}
-          facingMode="user"
-          stopStream={isGameOver}
-        />
-      </div>
+          }
+          if (err) {
+            console.warn(err)
+          }
+        }}
+        width={1024}
+        height={768}
+        facingMode="user"
+        stopStream={isGameOver}
+      />
       {isGameOver ? (
         <>
           <button
