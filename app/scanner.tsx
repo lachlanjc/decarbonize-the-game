@@ -94,7 +94,7 @@ const BarcodeScannerComponent = ({
   }, [])
 
   return (
-    <div className="absolute opacity-0">
+    <div className="absolute opacity-0 pointer-events-none" aria-hidden>
       <Webcam
         width={width}
         height={height}

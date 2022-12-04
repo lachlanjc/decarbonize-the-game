@@ -33,7 +33,7 @@ function Page() {
     gameState.capacityLastHit <= gameState.year - 5
 
   useEffect(() => {
-    const yearTicker = setInterval(() => gameState.tickYear(), 1000)
+    const yearTicker = setInterval(() => gameState.tickYear(), 1500)
     return () => {
       clearInterval(yearTicker)
     }
@@ -57,18 +57,35 @@ function Page() {
 
   return (
     <main
-      className={`flex full-width min-h-screen flex-col items-center justify-center relative transition-colors ${
-        isGameOver ? 'bg-black' : 'bg-sky-500'
-      } text-white`}
+      className={`flex full-width min-h-screen flex-col items-center justify-center relative transition-colors ${isGameOver ? 'bg-black' : 'bg-sky-500'
+        } text-white`}
     >
       <EmissionsChart emissions={gameState.emissions} />
-      <Board installed={gameState.installed} />
+      <Board
+        installed={gameState.installed}
+        addlCapacity={gameState.capacityGoal - gameState.getCurrentCapacity()}
+        isGameOver={isGameOver}
+      />
+
+      <p
+        className="text-2xl absolute top-8 transition-opacity aria-hidden:opacity-0"
+        aria-live='assertive'
+        aria-hidden={gameState.inGameMessage.lastUpdated <= gameState.year - 2}
+      >
+        {gameState.inGameMessage.text}
+      </p>
 
       <p
         className="font-bold text-4xl mb-6"
         onDoubleClick={() => gameState.endGame()}
       >
-        {gameState.year}
+        {gameState.year} &middot;{' '}
+        {new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+          maximumFractionDigits: 0,
+        }).format(gameState.budget < 0 ? 0 : gameState.budget)}{' '}
+        remaining
       </p>
       <p className="font-bold text-8xl relative proportional-nums">
         {new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(
@@ -108,24 +125,26 @@ function Page() {
               <EmojiFrownFill size={24} />
               Game over
             </p>
-            <p className="text-2xl">{gameState.message}</p>
+            <p className="text-2xl">{gameState.endGameMessage}</p>
           </nav>
         </>
       ) : (
         <nav className="absolute bottom-8 py-5 px-8 shadow-dock rounded-2xl backdrop-blur-sm bg-white/50 text-black flex flex-col items-center gap-3">
+          {/*
           <Capacity
             current={gameState.getCurrentCapacity()}
             goal={gameState.capacityGoal}
             goalLastHit={gameState.capacityLastHit}
             currentYear={gameState.year}
           />
+          */}
           {isCapacityOver && (
-            <p className="absolute top-12 left-1/2 -translate-x-1/2 uppercase font-bold bg-red-500 text-white px-2 rounded-md">
+            <p className="absolute top-4 left-1/2 -translate-x-1/2 uppercase font-bold text-lg bg-red-500 text-white px-2 rounded-md">
               Grid at capacity
             </p>
           )}
           <div
-            className="grid grid-cols-4 gap-8 aria-disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:pointer-events-none"
+            className="grid grid-cols-4 gap-8 aria-disabled:opacity-25 aria-disabled:cursor-not-allowed aria-disabled:pointer-events-none"
             aria-disabled={isCapacityOver}
           >
             {Object.entries(gameState.sources).map(([key, source]) => (

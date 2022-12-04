@@ -5,6 +5,7 @@ import random from 'lodash/random'
 export const CONSTANTS = {
   gameYearStart: 2022,
   gameYearSpan: 50,
+  maxInstalledSources: 14,
 } as const
 
 export type SourceName = 'solar' | 'wind' | 'coal' | 'gas'
@@ -24,11 +25,16 @@ interface Source {
 
 // define types for state values and actions separately
 export type State = {
+  level: number
   year: number
   budget: number
   capacityGoal: number
   capacityLastHit: number
-  message: string
+  inGameMessage: {
+    text: string
+    lastUpdated: number
+  }
+  endGameMessage: string
   installed: Array<Source>
   sources: Record<SourceName, Omit<Source, 'source' | 'active'>>
   emissions: Record<number, number>
@@ -54,11 +60,16 @@ const getInitialEmissions = () =>
     .reduce((acc, year) => ({ ...acc, [year]: 0 }), {})
 
 const initialState: State = {
-  budget: 0,
+  level: 1,
+  budget: 300,
   year: 2022,
   capacityGoal: 4,
   capacityLastHit: CONSTANTS.gameYearStart,
-  message: 'Welcome to Re-electrify!',
+  inGameMessage: {
+    text: 'Welcome to Decarbonize: The Game!',
+    lastUpdated: CONSTANTS.gameYearStart,
+  },
+  endGameMessage: '',
   installed: [
     { source: 'coal', price: 0, co2Rate: 25, size: 1, active: true },
     { source: 'gas', price: 0, co2Rate: 15, size: 1, active: true },
@@ -81,7 +92,8 @@ const useGameState = create<State & Actions>((set, get) => ({
   isGameOver: () =>
     get().year >= 2022 + CONSTANTS.gameYearSpan ||
     (get().getCurrentCapacity() <= get().capacityGoal &&
-      get().capacityLastHit <= get().year - 5),
+      get().capacityLastHit <= get().year - 8) ||
+    get().budget < 0,
 
   getCurrentCapacity: () => get().installed.filter((src) => src.active).length,
 
@@ -99,6 +111,11 @@ const useGameState = create<State & Actions>((set, get) => ({
 
   purchase: (srcName: SourceName) => {
     // console.log('PURCHASE', srcName)
+
+    if (get().installed.length >= CONSTANTS.maxInstalledSources) {
+      return set({ inGameMessage: 'The board is full.' })
+    }
+
     const { sources } = get()
     const source = sources[srcName] as Source
     source.source = srcName
@@ -126,18 +143,38 @@ const useGameState = create<State & Actions>((set, get) => ({
   },
 
   tickYear: () => {
-    const { year, emissions, capacityGoal, isGameOver } = get()
+    const { emissions, capacityGoal, sources, isGameOver } = get()
     if (isGameOver()) return
-    emissions[year] = get().getYearEmissions()
-    if (year + 1 === CONSTANTS.gameYearStart + CONSTANTS.gameYearSpan) {
-      set({ message: 'You made it to the end!' })
+
+    const year = get().year + 1
+
+    if (year === CONSTANTS.gameYearStart + CONSTANTS.gameYearSpan) {
+      set({ endGameMessage: 'You made it to the end!' })
     }
-    set({ year: year + 1, emissions })
+
+    // if (year === CONSTANTS.gameYearStart + 3) {
+    //   set({ inGameMessage: '' })
+    // }
+
+    emissions[year] = get().getYearEmissions()
+    const addlBudget =
+      Math.min(...Object.values(sources).map((src) => src.price)) * 0.7
+    set(({ budget }) => ({
+      year,
+      emissions,
+      budget: budget + addlBudget,
+    }))
+
     if (get().getCurrentCapacity() >= capacityGoal) {
-      set({ capacityLastHit: year, message: 'Capacity goal hit!' })
+      set({
+        capacityLastHit: year,
+        inGameMessage: { text: 'Nice, hit the capacity.', lastUpdated: year },
+      })
     } else {
       // capacity not hit
-      set({ message: 'You didn’t provide enough electricity to meet demand.' })
+      set({
+        endGameMessage: 'You didn’t provide enough electricity to meet demand.',
+      })
     }
     if (year % 8 === 0) {
       set({ capacityGoal: capacityGoal + 1 })
@@ -145,7 +182,7 @@ const useGameState = create<State & Actions>((set, get) => ({
   },
 
   endGame: () => {
-    set({ message: 'Game ended.', year: 2100 })
+    set({ endGameMessage: 'Game ended.', year: 2100 })
   },
 
   reset: () => {
