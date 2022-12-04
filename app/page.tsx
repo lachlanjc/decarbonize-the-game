@@ -65,7 +65,7 @@ function Page() {
       <Board installed={gameState.installed} />
 
       <p
-        className="absolute top-8 left-8 font-bold text-3xl"
+        className="font-bold text-4xl mb-6"
         onDoubleClick={() => gameState.endGame()}
       >
         {gameState.year}
