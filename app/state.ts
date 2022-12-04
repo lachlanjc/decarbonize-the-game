@@ -1,7 +1,5 @@
 import create from 'zustand'
-import { subscribeWithSelector } from 'zustand/middleware'
 import sum from 'lodash/sum'
-import { cloneDeep } from 'lodash'
 
 export const CONSTANTS = {
   gameYearStart: 2022,
@@ -64,7 +62,7 @@ const initialState: State = {
   level: 1,
   budget: 300,
   year: 2022,
-  capacityGoal: 4,
+  capacityGoal: 3,
   capacityLastHit: CONSTANTS.gameYearStart,
   inGameMessage: {
     text: 'Welcome to Decarbonize: The Game!',
@@ -87,11 +85,11 @@ const initialState: State = {
 }
 
 // create store
-const useGameState = create<State & Actions>((set, get) => ({
+const useGameState = create<State & Actions>()((set, get) => ({
   ...initialState,
 
   isGameOver: () =>
-    get().year >= 2022 + CONSTANTS.gameYearSpan ||
+    get().year >= CONSTANTS.gameYearStart + CONSTANTS.gameYearSpan ||
     (get().getCurrentCapacity() <= get().capacityGoal &&
       get().capacityLastHit <= get().year - 8) ||
     get().budget < 0,
@@ -111,21 +109,21 @@ const useGameState = create<State & Actions>((set, get) => ({
     get().installed.filter((src) => src.source === srcName).length,
 
   purchase: (srcName: SourceName) => {
-    // console.log('PURCHASE', srcName)
+    const { sources, year } = get()
 
     if (get().installed.length >= CONSTANTS.maxInstalledSources) {
-      return set(({ year }) => ({
+      return set({
         inGameMessage: { text: 'The board is full.', lastUpdated: year },
-      }))
+      })
     }
 
-    const { sources } = get()
     const source = sources[srcName] as Source
     source.source = srcName
     source.active = true
 
     set(({ budget }) => ({ budget: budget - source.price }))
 
+    // TODO wind learning curve
     if (srcName === 'solar') {
       const capacity = get().getLifetimeCapacityOfSource('solar')
       const scaleFactor = capacity === 1 || capacity % 2 === 1 ? 0.8 : 1
@@ -136,17 +134,25 @@ const useGameState = create<State & Actions>((set, get) => ({
     set(({ installed }) => ({
       installed: [...installed, source],
     }))
+
+    // if (get().getCurrentCapacity() >= get().capacityGoal) {
+    //   set({
+    //     capacityLastHit: year,
+    //     inGameMessage: { text: 'Nice, hit the capacity.', lastUpdated: year },
+    //     endGameMessage: '',
+    //   })
+    // }
   },
 
   decomission: (srcName: SourceName) => {
-    const source = get().installed.find((src) => src.source === srcName)
+    // const source = get().installed.find((src) => src.source === srcName)
     // TODO: set active false
     // source.active = false
     // set({ installed: get().installed.push(source) })
   },
 
   tickYear: () => {
-    const { capacityGoal, sources, isGameOver } = get()
+    const { capacityGoal, capacityLastHit, sources, isGameOver } = get()
     if (isGameOver()) return
 
     const year = get().year + 1
@@ -169,19 +175,46 @@ const useGameState = create<State & Actions>((set, get) => ({
       budget: budget + addlBudget,
     }))
 
-    if (get().getCurrentCapacity() >= capacityGoal) {
-      set({
-        capacityLastHit: year,
-        inGameMessage: { text: 'Nice, hit the capacity.', lastUpdated: year },
-      })
-    } else {
-      // capacity not hit
-      set({
-        endGameMessage: 'You didn’t provide enough electricity to meet demand.',
-      })
+    if (get().getCurrentCapacity() <= capacityGoal) {
+      if (capacityLastHit <= year - 8) {
+        set({
+          endGameMessage:
+            'You didn’t provide enough electricity to meet demand.',
+        })
+      }
+      if (year === CONSTANTS.gameYearStart + 6) {
+        set({
+          inGameMessage: {
+            text: 'Install another source quickly!',
+            lastUpdated: year,
+          },
+        })
+      }
     }
+
     if (year % 8 === 0) {
       set({ capacityGoal: capacityGoal + 1 })
+      if (get().installed.length === initialState.installed.length) {
+        set({
+          inGameMessage: {
+            text: 'Time to install an additional source.',
+            lastUpdated: year,
+          },
+        })
+      }
+    }
+
+    if (year === CONSTANTS.gameYearStart + 13) {
+      // TODO use real numbers
+      sources.coal.price += 50
+      sources.gas.price += 22
+      set({
+        inGameMessage: {
+          text: 'The UN has set a price of carbon, causing fossil fuel prices to increase.',
+          lastUpdated: year,
+        },
+        sources,
+      })
     }
   },
 

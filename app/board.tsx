@@ -1,8 +1,9 @@
-import type { ReactNode } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { CONSTANTS, State, type SourceName } from './state'
 import { IconCoal, IconGas, IconWind, IconSolar } from './icons'
 import { ExclamationTriangleFill, X } from 'react-bootstrap-icons'
 import times from 'lodash/times'
+import useSound from 'use-sound'
 
 const sourceIcons: Record<SourceName, ReactNode> = {
   solar: <IconSolar className="fill-amber-300" size={48} />,
@@ -16,6 +17,16 @@ function Board({
   addlCapacity = 0,
   isGameOver = false,
 }: Pick<State, 'installed'> & { addlCapacity: number; isGameOver: boolean }) {
+  const [playPop] = useSound('/sounds/menu-open.mp3', { volume: 0.875 })
+
+  const [prevAddlCapacity, setPrevAddlCapacity] = useState(0)
+  useEffect(() => {
+    if (addlCapacity > prevAddlCapacity) {
+      playPop()
+    }
+    setPrevAddlCapacity(addlCapacity)
+  }, [addlCapacity])
+
   return (
     <div className="grid grid-cols-4 grid-rows-4 grid-flow-dense gap-2 bg-sky-700 p-2 rounded-xl shadow-dock absolute top-8 right-8 [min-height:296px]">
       {installed

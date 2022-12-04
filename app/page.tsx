@@ -4,7 +4,6 @@ import { ReactNode, useEffect } from 'react'
 import useGameState, { type SourceName } from './state'
 import EmissionsChart from './emissions-chart'
 import Board from './board'
-import Capacity from './capacity'
 import { IconCoal, IconGas, IconWind, IconSolar } from './icons'
 import { ArrowRepeat, EmojiFrownFill } from 'react-bootstrap-icons'
 import useKeypress from 'react-use-keypress'
@@ -33,10 +32,7 @@ function Page() {
     currentCapacity >= gameState.capacityGoal &&
     gameState.capacityLastHit <= gameState.year - 5
 
-  const [playPurchase] = useSound(
-    '/sounds/pop-up-off.mp3',
-    { volume: 0.5 }
-  )
+  const [playPurchase] = useSound('/sounds/bite.mp3', { volume: 0.875 })
 
   useEffect(() => {
     const yearTicker = setInterval(() => gameState.tickYear(), 1500)
@@ -80,8 +76,11 @@ function Page() {
 
       <p
         className="text-2xl absolute top-8 transition-opacity aria-hidden:opacity-0"
-        aria-live='assertive'
-        aria-hidden={gameState.inGameMessage.lastUpdated <= gameState.year - 3}
+        aria-live="assertive"
+        aria-hidden={
+          isGameOver ||
+          gameState.inGameMessage.lastUpdated <= gameState.year - 1
+        }
       >
         {gameState.inGameMessage.text}
       </p>
@@ -111,6 +110,7 @@ function Page() {
             if (Object.keys(sourceIcons).includes(key)) {
               console.log('PURCHASING', key)
               gameState.purchase(key as SourceName)
+              playPurchase()
             }
           }
           if (err) {
@@ -122,6 +122,7 @@ function Page() {
         facingMode="user"
         stopStream={isGameOver}
       />
+
       {isGameOver ? (
         <>
           <button
@@ -149,14 +150,14 @@ function Page() {
             currentYear={gameState.year}
           />
           */}
-          {isCapacityOver && (
+          {/* isCapacityOver && (
             <p className="absolute top-4 left-1/2 -translate-x-1/2 uppercase font-bold text-lg bg-red-500 text-white px-2 rounded-md">
               Grid at capacity
             </p>
-          )}
+          ) */}
           <div
             className="grid grid-cols-4 gap-8 aria-disabled:opacity-25 aria-disabled:cursor-not-allowed aria-disabled:pointer-events-none"
-            aria-disabled={isCapacityOver}
+          // aria-disabled={isCapacityOver}
           >
             {Object.entries(gameState.sources).map(([key, source]) => (
               <button
