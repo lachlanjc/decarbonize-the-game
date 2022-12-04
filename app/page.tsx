@@ -89,13 +89,7 @@ function Page() {
         className="font-bold text-4xl mb-6"
         onDoubleClick={() => gameState.endGame()}
       >
-        {gameState.year} &middot;{' '}
-        {new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD',
-          maximumFractionDigits: 0,
-        }).format(gameState.budget < 0 ? 0 : gameState.budget)}{' '}
-        remaining
+        {gameState.year}
       </p>
       <p className="font-bold text-8xl relative proportional-nums">
         {new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(

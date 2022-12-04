@@ -25,7 +25,7 @@ interface Source {
 // define types for state values and actions separately
 export type State = {
   readonly year: number
-  readonly budget: number
+  // readonly budget: number
   readonly capacityGoal: number
   readonly capacityLastHit: number
   readonly inGameMessage: {
@@ -58,7 +58,7 @@ const getInitialEmissions = () =>
     .reduce((acc, year) => ({ ...acc, [year]: 0 }), {})
 
 const initialState: State = {
-  budget: 300,
+  // budget: 300,
   year: 2022,
   capacityGoal: 3,
   capacityLastHit: CONSTANTS.gameYearStart,
@@ -89,8 +89,8 @@ const useGameState = create<State & Actions>()((set, get) => ({
   isGameOver: () =>
     get().year >= CONSTANTS.gameYearStart + CONSTANTS.gameYearSpan ||
     (get().getCurrentCapacity() <= get().capacityGoal &&
-      get().capacityLastHit <= get().year - 8) ||
-    get().budget < 0,
+      get().capacityLastHit <= get().year - 8),
+  // get().budget < 0,
 
   getCurrentCapacity: () => get().installed.filter((src) => src.active).length,
 
@@ -119,7 +119,7 @@ const useGameState = create<State & Actions>()((set, get) => ({
     source.source = srcName
     source.active = true
 
-    set(({ budget }) => ({ budget: budget - source.price }))
+    // set(({ budget }) => ({ budget: budget - source.price }))
 
     // TODO wind learning curve
     if (srcName === 'solar') {
@@ -165,13 +165,13 @@ const useGameState = create<State & Actions>()((set, get) => ({
 
     const emissions = structuredClone(get().emissions)
     emissions[year] = get().getYearEmissions()
-    const addlBudget =
-      Math.min(...Object.values(sources).map((src) => src.price)) * 0.7
-    set(({ budget }) => ({
+    // const addlBudget =
+    // Math.min(...Object.values(sources).map((src) => src.price)) * 0.7
+    set({
       year,
       emissions,
-      budget: budget + addlBudget,
-    }))
+      // budget: budget + addlBudget,
+    })
 
     if (get().getCurrentCapacity() <= capacityGoal) {
       if (capacityLastHit <= year - 8) {
