@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from 'react'
-import { CONSTANTS, State, type SourceName } from './state'
+import { State, type SourceName } from './state'
 import { IconCoal, IconGas, IconWind, IconSolar } from './icons'
-import { ExclamationTriangleFill, X } from 'react-bootstrap-icons'
+import { ExclamationTriangleFill } from 'react-bootstrap-icons'
 import times from 'lodash/times'
 import useSound from 'use-sound'
 
@@ -35,8 +35,9 @@ function Board({
           <div
             key={`${source}${price}${i}`}
             title={source}
-            className={`bg-sky-400 rounded-lg p-2 flex flex-col items-center justify-center group ${size === 4 ? 'col-span-2' : `col-span-${size}`
-              }`}
+            className={`bg-sky-400 rounded-lg p-2 flex flex-col items-center justify-center group ${
+              size === 4 ? 'col-span-2' : `col-span-${size}`
+            }`}
           >
             {sourceIcons[source]}
           </div>
@@ -44,10 +45,13 @@ function Board({
       {times(addlCapacity, (i) => (
         <div
           key={i}
-          className={`rounded-lg p-2 aspect-square flex flex-col items-center justify-center border border-sky-100 border-dashed border-4 ${isGameOver ? 'bg-sky-500' : 'animate-pulse even:delay-100'
-            }`}
+          className={`rounded-lg p-2 aspect-square flex flex-col items-center justify-center border border-sky-100 border-dashed border-4 ${
+            isGameOver ? 'bg-sky-500' : 'animate-pulse even:delay-100'
+          }`}
         >
-          {isGameOver && <ExclamationTriangleFill className="fill-sky-200" size={32} />}
+          {isGameOver && (
+            <ExclamationTriangleFill className="fill-sky-200" size={32} />
+          )}
         </div>
       ))}
       <div className="col-span-1 col-span-2 row-span-2" hidden aria-hidden />

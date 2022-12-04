@@ -24,7 +24,6 @@ interface Source {
 
 // define types for state values and actions separately
 export type State = {
-  readonly level: number
   readonly year: number
   readonly budget: number
   readonly capacityGoal: number
@@ -49,7 +48,7 @@ type Actions = {
   getLifetimeEmissions: () => number
   getLifetimeCapacityOfSource: (src: SourceName) => number
   purchase: (src: SourceName) => void
-  decomission: (src: SourceName) => void
+  // decomission: (src: SourceName) => void
 }
 
 const getInitialEmissions = () =>
@@ -59,7 +58,6 @@ const getInitialEmissions = () =>
     .reduce((acc, year) => ({ ...acc, [year]: 0 }), {})
 
 const initialState: State = {
-  level: 1,
   budget: 300,
   year: 2022,
   capacityGoal: 3,
@@ -76,7 +74,7 @@ const initialState: State = {
     { source: 'wind', price: 0, co2Rate: 0, size: 2, active: true },
   ],
   sources: {
-    solar: { price: 83, co2Rate: 0, size: 4 },
+    solar: { price: 83, co2Rate: 0, size: 2 },
     wind: { price: 160, co2Rate: 0, size: 2 },
     coal: { price: 350, co2Rate: 22.6, size: 1 },
     gas: { price: 100, co2Rate: 9.7, size: 1 },
@@ -144,12 +142,12 @@ const useGameState = create<State & Actions>()((set, get) => ({
     // }
   },
 
-  decomission: (srcName: SourceName) => {
-    // const source = get().installed.find((src) => src.source === srcName)
-    // TODO: set active false
-    // source.active = false
-    // set({ installed: get().installed.push(source) })
-  },
+  // decomission: (srcName: SourceName) => {
+  // const source = get().installed.find((src) => src.source === srcName)
+  // TODO: set active false
+  // source.active = false
+  // set({ installed: get().installed.push(source) })
+  // },
 
   tickYear: () => {
     const { capacityGoal, capacityLastHit, sources, isGameOver } = get()
@@ -223,9 +221,7 @@ const useGameState = create<State & Actions>()((set, get) => ({
   },
 
   reset: () => {
-    // initialState.emissions = getInitialEmissions()
     set(initialState)
-    console.log('initial emissions', initialState.emissions)
   },
 }))
 

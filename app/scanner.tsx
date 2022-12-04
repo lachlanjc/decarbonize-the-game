@@ -9,6 +9,7 @@ import Webcam from 'react-webcam'
 
 const hints = new Map()
 hints.set(DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.CODE_39])
+const codeReader = new BrowserMultiFormatReader(hints)
 
 const BarcodeScannerComponent = ({
   onUpdate,
@@ -34,7 +35,6 @@ const BarcodeScannerComponent = ({
   const webcamRef = React.useRef(null)
 
   const capture = React.useCallback(() => {
-    const codeReader = new BrowserMultiFormatReader(hints)
     const imageSrc = webcamRef?.current?.getScreenshot()
     if (imageSrc) {
       codeReader
