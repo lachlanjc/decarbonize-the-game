@@ -32,7 +32,7 @@ const BarcodeScannerComponent = ({
   videoConstraints?: MediaTrackConstraints
   stopStream?: boolean
 }): React.ReactElement => {
-  const webcamRef = React.useRef(null)
+  const webcamRef = React.useRef<Webcam>(null)
 
   const capture = React.useCallback(() => {
     const imageSrc = webcamRef?.current?.getScreenshot()
@@ -75,9 +75,11 @@ const BarcodeScannerComponent = ({
 
   React.useEffect(() => {
     if (stopStream) {
-      let stream = webcamRef?.current?.video.srcObject
+      let stream = webcamRef?.current?.video?.srcObject
       if (stream) {
+        // @ts-expect-error copied this code in
         stream.getTracks().forEach((track: any) => {
+          // @ts-expect-error copied this code in
           stream.removeTrack(track)
           track.stop()
         })

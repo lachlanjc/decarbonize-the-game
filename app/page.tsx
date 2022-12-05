@@ -21,10 +21,6 @@ const sourceIcons: Record<SourceName, ReactNode> = {
 
 function Page() {
   const gameState = useGameState()
-  if (typeof document != null) {
-    // @ts-expect-error
-    window.gameState = gameState
-  }
 
   const isGameOver = gameState.isGameOver()
   const currentCapacity = gameState.getCurrentCapacity()
@@ -116,7 +112,6 @@ function Page() {
         facingMode="user"
         stopStream={isGameOver}
       />
-
       {isGameOver ? (
         <>
           <button
@@ -158,7 +153,6 @@ function Page() {
                 className="text-center flex flex-col items-center px-2 group cursor-pointer"
                 key={key}
                 onClick={() => gameState.purchase(key as SourceName)}
-                onContextMenu={() => gameState.decomission(key as SourceName)}
               >
                 {sourceIcons[key as SourceName] as ReactNode}
                 <strong className="font-bold capitalize mt-3">{key}</strong>
