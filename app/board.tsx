@@ -21,7 +21,7 @@ function Board({
 
   const [prevAddlCapacity, setPrevAddlCapacity] = useState(0)
   useEffect(() => {
-    if (addlCapacity > prevAddlCapacity) {
+    if (addlCapacity > 0 && addlCapacity > prevAddlCapacity) {
       playPop()
     }
     setPrevAddlCapacity(addlCapacity)
@@ -30,14 +30,12 @@ function Board({
   return (
     <div className="grid grid-cols-4 grid-rows-4 grid-flow-dense gap-2 bg-sky-700 p-2 rounded-xl shadow-dock absolute top-8 right-8 [min-height:296px]">
       {installed
-        .filter((source) => source.active)
         .map(({ source, price, size }, i) => (
           <div
             key={`${source}${price}${i}`}
             title={source}
-            className={`bg-sky-400 rounded-lg p-2 flex flex-col items-center justify-center group ${
-              size === 4 ? 'col-span-2' : `col-span-${size}`
-            }`}
+            className={`bg-sky-400 rounded-lg p-2 flex flex-col items-center justify-center group ${size === 4 ? 'col-span-2' : `col-span-${size}`
+              }`}
           >
             {sourceIcons[source]}
           </div>
@@ -45,9 +43,8 @@ function Board({
       {times(addlCapacity, (i) => (
         <div
           key={i}
-          className={`rounded-lg p-2 aspect-square flex flex-col items-center justify-center border border-sky-100 border-dashed border-4 ${
-            isGameOver ? 'bg-sky-500' : 'animate-pulse even:delay-100'
-          }`}
+          className={`rounded-lg p-2 aspect-square flex flex-col items-center justify-center border border-sky-100 border-dashed border-4 ${isGameOver ? 'bg-sky-500' : 'animate-pulse even:delay-100'
+            }`}
         >
           {isGameOver && (
             <ExclamationTriangleFill className="fill-sky-200" size={32} />

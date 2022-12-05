@@ -3,6 +3,7 @@
 import { ReactNode, useEffect } from 'react'
 import useGameState, { type SourceName } from './state'
 import EmissionsChart from './emissions-chart'
+import PriceChart from './price-chart'
 import Board from './board'
 import { IconCoal, IconGas, IconWind, IconSolar } from './icons'
 import { ArrowRepeat, EmojiFrownFill } from 'react-bootstrap-icons'
@@ -63,7 +64,8 @@ function Page() {
       className={`flex full-width min-h-screen flex-col items-center justify-center relative transition-colors ${isGameOver ? 'bg-black' : 'bg-sky-500'
         } text-white`}
     >
-      <EmissionsChart emissions={gameState.emissions} />
+      <EmissionsChart emissions={gameState.emissionsLog} />
+      <PriceChart prices={gameState.priceLog} />
       <Board
         installed={gameState.installed}
         addlCapacity={gameState.capacityGoal - gameState.getCurrentCapacity()}
@@ -85,7 +87,11 @@ function Page() {
         className="font-bold text-4xl mb-6"
         onDoubleClick={() => gameState.endGame()}
       >
-        {gameState.year}
+        {gameState.year} &middot;{' '}
+        {new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+        }).format(gameState.getCurrentPrice())}/kWH
       </p>
       <p className="font-bold text-8xl relative proportional-nums">
         {new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(

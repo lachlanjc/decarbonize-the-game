@@ -84,7 +84,7 @@ export function IconSolar({ size, className }: IconProps) {
       width={size}
       height={size}
       fill="currentColor"
-      className={`${className} motion-safe:group-hover:animate-spin-slow`}
+      className={`${className} motion-safe:group-hover:animate-spin`}
       viewBox="0 0 16 16"
     >
       <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z" />
@@ -102,7 +102,7 @@ export function IconWind({ size, className }: IconProps) {
       className={`${className}`}
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g className="motion-safe:group-hover:animate-spin-slow motion-safe:group-hover:[animation-duration:3s] origin-center">
+      <g className="motion-safe:group-hover:animate-spin motion-safe:group-hover:[animation-duration:3s] origin-center">
         <path
           d="M8 0C8.26522 0 8.51957 0.105357 8.70711 0.292893C8.89464 0.48043 9 0.734784 9 1V6.268H7V1C7 0.734784 7.10536 0.48043 7.29289 0.292893C7.48043 0.105357 7.73478 0 8 0Z"
           fill="white"

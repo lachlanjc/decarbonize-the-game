@@ -1,5 +1,6 @@
 import create from 'zustand'
 import sum from 'lodash/sum'
+import groupBy from 'lodash/groupBy'
 
 export const CONSTANTS = {
   gameYearStart: 2022,
@@ -17,9 +18,11 @@ interface Source {
   // total tCO2e/year
   co2Rate: number
   // Whether it’s active or decommissioned
-  active: boolean
+  // active: boolean
   // Number of squares on the board it takes up
   size: number
+  // Year it was installed
+  year: number
 }
 
 // define types for state values and actions separately
@@ -34,8 +37,9 @@ export type State = {
   }
   readonly endGameMessage: string
   readonly installed: Array<Source>
-  readonly sources: Record<SourceName, Omit<Source, 'source' | 'active'>>
-  readonly emissions: Record<number, number>
+  readonly sources: Record<SourceName, Omit<Source, 'source' | 'year'>>
+  readonly emissionsLog: Record<number, number>
+  readonly priceLog: Record<number, number>
 }
 
 type Actions = {
@@ -44,6 +48,7 @@ type Actions = {
   endGame: () => void
   isGameOver: () => boolean
   getCurrentCapacity: () => number
+  getCurrentPrice: () => number
   getYearEmissions: () => number
   getLifetimeEmissions: () => number
   getLifetimeCapacityOfSource: (src: SourceName) => number
@@ -51,14 +56,13 @@ type Actions = {
   // decomission: (src: SourceName) => void
 }
 
-const getInitialEmissions = () =>
+const getInitialLog = () =>
   new Array(CONSTANTS.gameYearSpan)
     .fill(0)
     .map((zero, i) => CONSTANTS.gameYearStart + i)
-    .reduce((acc, year) => ({ ...acc, [year]: 0 }), {})
+    .reduce((acc, year) => ({ ...acc, [year]: null }), {})
 
 const initialState: State = {
-  // budget: 300,
   year: 2022,
   capacityGoal: 3,
   capacityLastHit: CONSTANTS.gameYearStart,
@@ -68,10 +72,28 @@ const initialState: State = {
   },
   endGameMessage: '',
   installed: [
-    { source: 'coal', price: 0, co2Rate: 25, size: 1, active: true },
-    { source: 'gas', price: 0, co2Rate: 15, size: 1, active: true },
-    // { source: 'gas', price: 0, co2Rate: 15, active: true },
-    { source: 'wind', price: 0, co2Rate: 0, size: 2, active: true },
+    {
+      source: 'coal',
+      price: 0,
+      co2Rate: 25,
+      size: 1,
+      year: CONSTANTS.gameYearStart,
+    },
+    {
+      source: 'gas',
+      price: 0,
+      co2Rate: 15,
+      size: 1,
+      year: CONSTANTS.gameYearStart,
+    },
+    // { source: 'gas', price: 0, co2Rate: 15, year: CONSTANTS.gameYearStart },
+    {
+      source: 'wind',
+      price: 0,
+      co2Rate: 0,
+      size: 2,
+      year: CONSTANTS.gameYearStart,
+    },
   ],
   sources: {
     solar: { price: 83, co2Rate: 0, size: 2 },
@@ -79,7 +101,8 @@ const initialState: State = {
     coal: { price: 350, co2Rate: 22.6, size: 1 },
     gas: { price: 100, co2Rate: 9.7, size: 1 },
   },
-  emissions: getInitialEmissions(),
+  emissionsLog: getInitialLog(),
+  priceLog: getInitialLog(),
 }
 
 // create store
@@ -92,16 +115,33 @@ const useGameState = create<State & Actions>()((set, get) => ({
       get().capacityLastHit <= get().year - 8),
   // get().budget < 0,
 
-  getCurrentCapacity: () => get().installed.filter((src) => src.active).length,
+  getCurrentCapacity: () => get().installed.length,
 
-  getYearEmissions: () =>
-    sum(
-      get()
-        .installed.filter((src) => src.active)
-        .map((source) => source.co2Rate)
-    ),
+  getCurrentPrice: () => {
+    // const installedSources = groupBy(get().installed, 'source')
+    // { coal: [{},{}], gas: 1, wind: 1 }
+    // multiply price by number of installations per source
+    // return sum(
+    //   Object.entries(installedSources).map(([src, sources]) => {
+    //     const { price } = get().sources[src as SourceName]
+    //     return price * sources.length
+    //   })
+    // )
+    const { installed } = get()
+    // const installedCoal = installed.filter((src) => src.source === 'coal')
+    // installedCoal.length *
 
-  getLifetimeEmissions: () => sum(Object.values(get().emissions)),
+    const unmetDemandMultiplier =
+      get().getCurrentCapacity() < get().capacityGoal
+        ? 1 + (get().year - get().capacityLastHit) * 0.25
+        : 1
+
+    return (get().capacityGoal / installed.length) * 2 * unmetDemandMultiplier
+  },
+
+  getYearEmissions: () => sum(get().installed.map((source) => source.co2Rate)),
+
+  getLifetimeEmissions: () => sum(Object.values(get().emissionsLog)),
 
   getLifetimeCapacityOfSource: (srcName: SourceName) =>
     get().installed.filter((src) => src.source === srcName).length,
@@ -115,9 +155,10 @@ const useGameState = create<State & Actions>()((set, get) => ({
       })
     }
 
-    const source = sources[srcName] as Source
+    const source = structuredClone(sources[srcName]) as Source
     source.source = srcName
-    source.active = true
+    source.year = year
+    // source.active = true
 
     // set(({ budget }) => ({ budget: budget - source.price }))
 
@@ -144,32 +185,35 @@ const useGameState = create<State & Actions>()((set, get) => ({
 
   // decomission: (srcName: SourceName) => {
   // const source = get().installed.find((src) => src.source === srcName)
-  // TODO: set active false
   // source.active = false
   // set({ installed: get().installed.push(source) })
   // },
 
   tickYear: () => {
-    const { capacityGoal, capacityLastHit, sources, isGameOver } = get()
+    const { capacityGoal, capacityLastHit, isGameOver } = get()
     if (isGameOver()) return
 
-    const year = get().year + 1
-
-    if (year === CONSTANTS.gameYearStart + CONSTANTS.gameYearSpan) {
-      set({ endGameMessage: 'You made it to the end!' })
-    }
+    const priceLog = structuredClone(get().priceLog)
+    priceLog[get().year] = get().getCurrentPrice()
 
     // if (year === CONSTANTS.gameYearStart + 3) {
     //   set({ inGameMessage: '' })
     // }
 
-    const emissions = structuredClone(get().emissions)
-    emissions[year] = get().getYearEmissions()
+    const emissionsLog = structuredClone(get().emissionsLog)
+    emissionsLog[get().year] = get().getYearEmissions()
     // const addlBudget =
     // Math.min(...Object.values(sources).map((src) => src.price)) * 0.7
+
+    const year = get().year + 1
+    if (year === CONSTANTS.gameYearStart + CONSTANTS.gameYearSpan) {
+      set({ endGameMessage: 'You made it to the end!' })
+    }
+
     set({
       year,
-      emissions,
+      emissionsLog,
+      priceLog,
       // budget: budget + addlBudget,
     })
 
@@ -177,7 +221,7 @@ const useGameState = create<State & Actions>()((set, get) => ({
       if (capacityLastHit <= year - 8) {
         set({
           endGameMessage:
-            'You didn’t provide enough electricity to meet demand.',
+            'You didn’t install enough electricity to meet demand.',
         })
       }
       if (year === CONSTANTS.gameYearStart + 6) {
@@ -190,7 +234,7 @@ const useGameState = create<State & Actions>()((set, get) => ({
       }
     }
 
-    if (year % 8 === 0) {
+    if (year % 6 === 0) {
       set({ capacityGoal: capacityGoal + 1 })
       if (get().installed.length === initialState.installed.length) {
         set({
@@ -202,6 +246,7 @@ const useGameState = create<State & Actions>()((set, get) => ({
       }
     }
 
+    /*
     if (year === CONSTANTS.gameYearStart + 13) {
       // TODO use real numbers
       sources.coal.price += 50
@@ -214,6 +259,7 @@ const useGameState = create<State & Actions>()((set, get) => ({
         sources,
       })
     }
+    */
   },
 
   endGame: () => {
