@@ -24,10 +24,10 @@ function Page() {
   const gameState = useGameState()
 
   const isGameOver = gameState.isGameOver()
-  const currentCapacity = gameState.getCurrentCapacity()
-  const isCapacityOver =
-    currentCapacity >= gameState.capacityGoal &&
-    gameState.capacityLastHit <= gameState.year - 5
+  // const currentCapacity = gameState.getCurrentCapacity()
+  // const isCapacityOver =
+  //   currentCapacity >= gameState.capacityGoal &&
+  //   gameState.capacityLastHit <= gameState.year - 5
 
   const [playPurchase] = useSound('/sounds/bite.mp3', { volume: 0.875 })
 
@@ -162,13 +162,13 @@ function Page() {
               >
                 {sourceIcons[key as SourceName] as ReactNode}
                 <strong className="font-bold capitalize mt-3">{key}</strong>
-                <p className="opacity-60 text-sm font-mono">
+                {/* <p className="opacity-60 text-sm font-mono">
                   {new Intl.NumberFormat('en-US', {
                     style: 'currency',
                     currency: 'USD',
                     maximumFractionDigits: 0,
                   }).format(source.price)}
-                </p>
+                  </p> */}
               </button>
             ))}
           </div>

@@ -111,32 +111,23 @@ const useGameState = create<State & Actions>()((set, get) => ({
 
   isGameOver: () =>
     get().year >= CONSTANTS.gameYearStart + CONSTANTS.gameYearSpan ||
-    (get().getCurrentCapacity() <= get().capacityGoal &&
+    (get().getCurrentCapacity() <= get().capacityGoal - 1 &&
       get().capacityLastHit <= get().year - 8),
   // get().budget < 0,
 
   getCurrentCapacity: () => get().installed.length,
 
   getCurrentPrice: () => {
-    // const installedSources = groupBy(get().installed, 'source')
-    // { coal: [{},{}], gas: 1, wind: 1 }
-    // multiply price by number of installations per source
-    // return sum(
-    //   Object.entries(installedSources).map(([src, sources]) => {
-    //     const { price } = get().sources[src as SourceName]
-    //     return price * sources.length
-    //   })
-    // )
-    const { installed } = get()
+    const { installed, year } = get()
+
+    const yearMultiplier =
+      2 + (year - CONSTANTS.gameYearStart) / CONSTANTS.gameYearSpan
     // const installedCoal = installed.filter((src) => src.source === 'coal')
     // installedCoal.length *
 
-    const unmetDemandMultiplier =
-      get().getCurrentCapacity() < get().capacityGoal
-        ? 1 + (get().year - get().capacityLastHit) * 0.25
-        : 1
+    const unmetDemandMultiplier = get().capacityGoal / installed.length
 
-    return (get().capacityGoal / installed.length) * 2 * unmetDemandMultiplier
+    return yearMultiplier * unmetDemandMultiplier
   },
 
   getYearEmissions: () => sum(get().installed.map((source) => source.co2Rate)),
@@ -149,11 +140,11 @@ const useGameState = create<State & Actions>()((set, get) => ({
   purchase: (srcName: SourceName) => {
     const { sources, year } = get()
 
-    if (get().installed.length >= CONSTANTS.maxInstalledSources) {
-      return set({
-        inGameMessage: { text: 'The board is full.', lastUpdated: year },
-      })
-    }
+    // if (get().installed.length >= CONSTANTS.maxInstalledSources) {
+    //   return set({
+    //     inGameMessage: { text: 'The board is full.', lastUpdated: year },
+    //   })
+    // }
 
     const source = structuredClone(sources[srcName]) as Source
     source.source = srcName
@@ -162,25 +153,31 @@ const useGameState = create<State & Actions>()((set, get) => ({
 
     // set(({ budget }) => ({ budget: budget - source.price }))
 
-    // TODO wind learning curve
     if (srcName === 'solar') {
       const capacity = get().getLifetimeCapacityOfSource('solar')
       const scaleFactor = capacity === 1 || capacity % 2 === 1 ? 0.8 : 1
       const price = sources.solar.price * scaleFactor
       set({ sources: { ...sources, solar: { ...sources.solar, price } } })
     }
+    // TODO wind learning curve
+    if (srcName === 'wind') {
+      const capacity = get().getLifetimeCapacityOfSource('wind')
+      const scaleFactor = capacity === 1 || capacity % 2 === 1 ? 0.8 : 1
+      const price = sources.wind.price * scaleFactor
+      set({ sources: { ...sources, wind: { ...sources.wind, price } } })
+    }
 
     set(({ installed }) => ({
       installed: [...installed, source],
     }))
 
-    // if (get().getCurrentCapacity() >= get().capacityGoal) {
-    //   set({
-    //     capacityLastHit: year,
-    //     inGameMessage: { text: 'Nice, hit the capacity.', lastUpdated: year },
-    //     endGameMessage: '',
-    //   })
-    // }
+    if (get().getCurrentCapacity() >= get().capacityGoal) {
+      set({
+        capacityLastHit: year,
+        inGameMessage: { text: 'Nice, hit the capacity.', lastUpdated: year },
+        endGameMessage: '',
+      })
+    }
   },
 
   // decomission: (srcName: SourceName) => {
@@ -232,6 +229,8 @@ const useGameState = create<State & Actions>()((set, get) => ({
           },
         })
       }
+    } else {
+      set({ capacityLastHit: year })
     }
 
     if (year % 6 === 0) {

@@ -2,6 +2,9 @@
 module.exports = {
   content: ['./app/**/*.{js,ts,tsx,mdx}', './components/**/*.{js,ts,tsx,mdx}'],
   darkMode: 'media',
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
   theme: {
     fontFamily: {
       sans: [
