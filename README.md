@@ -6,4 +6,4 @@ Read progress updates here: <https://edu.lachlanjc.com/2022-11-29_pcomp_final_pr
 
 If you’d like to play without the pieces, go ahead! <https://decarbonize-the-game.vercel.app/> Press a/s/d/f on your keyboard to buy the energy sources in the bottom dock. The camera usage is to scan barcodes on the game pieces instead of the keyboard.
 
-Made with Next.js 13, Tailwind CSS, Recharts, react-webcam, and zxing.
+Made with Next.js 13, Tailwind CSS, Recharts, and quagga2.

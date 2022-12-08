@@ -1,7 +1,7 @@
 'use client'
 
-import { ReactNode, useEffect } from 'react'
-import useGameState, { type SourceName } from './state'
+import { ReactNode, useEffect, useRef } from 'react'
+import useGameState, { CONSTANTS, type SourceName } from './state'
 import EmissionsChart from './emissions-chart'
 import PriceChart from './price-chart'
 import Board from './board'
@@ -9,9 +9,7 @@ import { IconCoal, IconGas, IconWind, IconSolar } from './icons'
 import { ArrowRepeat, EmojiFrownFill } from 'react-bootstrap-icons'
 import useKeypress from 'react-use-keypress'
 import useSound from 'use-sound'
-
-import dynamic from 'next/dynamic'
-const BarcodeScanner = dynamic(() => import('./scanner'), { ssr: false })
+import useScan from './use-scan'
 
 const sourceIcons: Record<SourceName, ReactNode> = {
   solar: <IconSolar className="fill-amber-300" size={52} />,
@@ -22,6 +20,7 @@ const sourceIcons: Record<SourceName, ReactNode> = {
 
 function Page() {
   const gameState = useGameState()
+  const scannerRef = useRef<HTMLDivElement>(null)
 
   const isGameOver = gameState.isGameOver()
   // const currentCapacity = gameState.getCurrentCapacity()
@@ -59,10 +58,35 @@ function Page() {
     playPurchase()
   })
 
+  useScan({
+    onDetected: (result) => {
+      const key = result?.toLowerCase()
+      if (Object.keys(sourceIcons).includes(key)) {
+        console.log('RECOGNIZED', key)
+        if (
+          gameState.year > CONSTANTS.gameYearStart + 6 &&
+          [gameState.year, gameState.year - 1].includes(
+            gameState.installed
+              .filter(({ source }) => source === key)
+              .reverse()[0]?.year
+          )
+        ) {
+          console.log('source recently purchased, punting')
+        } else {
+          gameState.purchase(key as SourceName)
+          playPurchase()
+        }
+      }
+    },
+    scannerRef,
+    isPaused: isGameOver,
+  })
+
   return (
     <main
-      className={`flex full-width min-h-screen flex-col items-center justify-center relative transition-colors ${isGameOver ? 'bg-black' : 'bg-sky-500'
-        } text-white`}
+      className={`flex full-width min-h-screen flex-col items-center justify-center relative transition-colors ${
+        isGameOver ? 'bg-black' : 'bg-sky-500'
+      } text-white`}
     >
       <EmissionsChart emissions={gameState.emissionsLog} />
       <PriceChart prices={gameState.priceLog} />
@@ -91,7 +115,8 @@ function Page() {
         {new Intl.NumberFormat('en-US', {
           style: 'currency',
           currency: 'USD',
-        }).format(gameState.getCurrentPrice())}/kWH
+        }).format(gameState.getCurrentPrice())}
+        /kWH
       </p>
       <p className="font-bold text-8xl relative proportional-nums">
         {new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(
@@ -99,57 +124,30 @@ function Page() {
         )}{' '}
         tCO<sub>2</sub>
       </p>
-      <BarcodeScanner
-        onUpdate={(err, result) => {
-          if (result) {
-            const key = result.getText().toLowerCase()
-            if (Object.keys(sourceIcons).includes(key)) {
-              console.log('PURCHASING', key)
-              gameState.purchase(key as SourceName)
-              playPurchase()
-            }
-          }
-          if (err) {
-            console.warn(err)
-          }
-        }}
-        width={1024}
-        height={768}
-        facingMode="user"
-        stopStream={isGameOver}
-      />
-      {isGameOver ? (
-        <>
-          <button
-            title="Restart game"
-            className="relative rounded-full shadow-dock p-4 bg-white cursor-pointer aspect-ratio-square mt-12"
-            onClick={() => gameState.reset()}
-          >
-            <ArrowRepeat size={64} className="fill-sky-500" />
-          </button>
-          <nav className="absolute bottom-6 py-5 px-8 shadow-dock rounded-2xl backdrop-blur-lg bg-black/25 text-white text-center">
-            <p className="font-bold text-red-400 mb-3 flex items-center justify-center gap-3 uppercase">
-              <EmojiFrownFill size={24} />
-              Game over
-            </p>
-            <p className="text-2xl">{gameState.endGameMessage}</p>
-          </nav>
-        </>
-      ) : (
+      <div className="absolute opacity-0 pointer-events-none" aria-hidden>
+        <div ref={scannerRef} />
+      </div>
+      {
+        isGameOver ? (
+          <>
+            <button
+              title="Restart game"
+              className="relative rounded-full shadow-dock p-4 bg-white cursor-pointer aspect-ratio-square mt-12"
+              onClick={() => gameState.reset()}
+            >
+              <ArrowRepeat size={64} className="fill-sky-500" />
+            </button>
+            <nav className="absolute bottom-6 py-5 px-8 shadow-dock rounded-2xl backdrop-blur-lg bg-black/25 text-white text-center">
+              <p className="font-bold text-red-400 mb-3 flex items-center justify-center gap-3 uppercase">
+                <EmojiFrownFill size={24} />
+                Game over
+              </p>
+              <p className="text-2xl">{gameState.endGameMessage}</p>
+            </nav>
+          </>
+        ) : null
+        /*
         <nav className="absolute bottom-8 py-5 px-8 shadow-dock rounded-2xl backdrop-blur-sm bg-white/50 text-black flex flex-col items-center gap-3">
-          {/*
-          <Capacity
-            current={gameState.getCurrentCapacity()}
-            goal={gameState.capacityGoal}
-            goalLastHit={gameState.capacityLastHit}
-            currentYear={gameState.year}
-          />
-          */}
-          {/* isCapacityOver && (
-            <p className="absolute top-4 left-1/2 -translate-x-1/2 uppercase font-bold text-lg bg-red-500 text-white px-2 rounded-md">
-              Grid at capacity
-            </p>
-          ) */}
           <div
             className="grid grid-cols-4 gap-8 aria-disabled:opacity-25 aria-disabled:cursor-not-allowed aria-disabled:pointer-events-none"
           // aria-disabled={isCapacityOver}
@@ -162,13 +160,13 @@ function Page() {
               >
                 {sourceIcons[key as SourceName] as ReactNode}
                 <strong className="font-bold capitalize mt-3">{key}</strong>
-                {/* <p className="opacity-60 text-sm font-mono">
+                <p className="opacity-60 text-sm font-mono">
                   {new Intl.NumberFormat('en-US', {
                     style: 'currency',
                     currency: 'USD',
                     maximumFractionDigits: 0,
                   }).format(source.price)}
-                  </p> */}
+                  </p>
               </button>
             ))}
           </div>
@@ -178,7 +176,8 @@ function Page() {
             className="fill-amber-400 fill-sky-500 fill-black fill-white fill-yellow-900"
           />
         </nav>
-      )}
+        */
+      }
     </main>
   )
 }
