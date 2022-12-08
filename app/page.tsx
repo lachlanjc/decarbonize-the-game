@@ -1,12 +1,17 @@
 'use client'
 
-import { ReactNode, useEffect, useRef } from 'react'
-import useGameState, { CONSTANTS, type SourceName } from './state'
+import { ReactNode, useEffect } from 'react'
+import useGameState, { type SourceName } from './state'
 import EmissionsChart from './emissions-chart'
 import PriceChart from './price-chart'
 import Board from './board'
 import { IconCoal, IconGas, IconWind, IconSolar } from './icons'
-import { ArrowRepeat, EmojiFrownFill } from 'react-bootstrap-icons'
+import {
+  ArrowRepeat,
+  EmojiFrownFill,
+  LightningCharge,
+  ThermometerHalf,
+} from 'react-bootstrap-icons'
 import useKeypress from 'react-use-keypress'
 import useSound from 'use-sound'
 
@@ -60,9 +65,9 @@ function Page() {
 
   return (
     <main
-      className={`flex full-width min-h-screen flex-col items-center justify-center relative transition-colors ${
+      className={`flex full-width min-h-screen flex-col relative transition-colors ${
         isGameOver ? 'bg-black' : 'bg-sky-500'
-      } text-white`}
+      } text-white p-12`}
     >
       <EmissionsChart emissions={gameState.emissionsLog} />
       <PriceChart prices={gameState.priceLog} />
@@ -73,7 +78,25 @@ function Page() {
       />
 
       <p
-        className="text-2xl absolute top-8 transition-opacity aria-hidden:opacity-0"
+        className="font-bold text-4xl mb-4 flex items-center"
+        onDoubleClick={() => gameState.endGame()}
+      >
+        {gameState.year} <LightningCharge size={32} className="ml-8 mr-4" />
+        {new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+        }).format(gameState.getCurrentPrice())}
+        /kWH
+      </p>
+      <p className="flex items-baseline gap-2 font-bold text-8xl relative proportional-nums mb-6">
+        <ThermometerHalf size={72} className="-ml-3" />
+        {new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(
+          gameState.getLifetimeEmissions()
+        )}{' '}
+        tons CO<sub>2</sub>
+      </p>
+      <p
+        className="text-2xl transition-opacity aria-hidden:opacity-0"
         aria-live="assertive"
         aria-hidden={
           isGameOver ||
@@ -83,23 +106,6 @@ function Page() {
         {gameState.inGameMessage.text}
       </p>
 
-      <p
-        className="font-bold text-4xl mb-6"
-        onDoubleClick={() => gameState.endGame()}
-      >
-        {gameState.year} &middot;{' '}
-        {new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD',
-        }).format(gameState.getCurrentPrice())}
-        /kWH
-      </p>
-      <p className="font-bold text-8xl relative proportional-nums">
-        {new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(
-          gameState.getLifetimeEmissions()
-        )}{' '}
-        tCO<sub>2</sub>
-      </p>
       <Scanner onPurchase={playPurchase} />
 
       {
@@ -107,12 +113,12 @@ function Page() {
           <>
             <button
               title="Restart game"
-              className="relative rounded-full shadow-dock p-4 bg-white cursor-pointer aspect-ratio-square mt-12"
+              className="relative rounded-full shadow-dock p-4 bg-white cursor-pointer aspect-ratio-square m-auto"
               onClick={() => gameState.reset()}
             >
               <ArrowRepeat size={64} className="fill-sky-500" />
             </button>
-            <nav className="absolute bottom-6 py-5 px-8 shadow-dock rounded-2xl backdrop-blur-lg bg-black/25 text-white text-center">
+            <nav className="mt-auto mx-auto mb-6 py-5 px-8 shadow-dock rounded-2xl backdrop-blur-lg bg-black/25 text-white text-center">
               <p className="font-bold text-red-400 mb-3 flex items-center justify-center gap-3 uppercase">
                 <EmojiFrownFill size={24} />
                 Game over

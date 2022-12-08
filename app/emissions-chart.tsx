@@ -22,8 +22,9 @@ function EmissionsChart({ emissions = {} }: { emissions: Data }) {
       height="100%"
       minHeight={1024}
       minWidth={768}
-      className={`absolute inset-0 pointer-events-none transition-opacity ${data.length < 4 ? 'opacity-0' : 'opacity-100'
-        }`}
+      className={`absolute inset-0 pointer-events-none transition-opacity ${
+        data.length < 4 ? 'opacity-0' : 'opacity-100'
+      }`}
     >
       <AreaChart
         data={data}
@@ -49,7 +50,7 @@ function EmissionsChart({ emissions = {} }: { emissions: Data }) {
             CONSTANTS.gameYearStart + CONSTANTS.gameYearSpan,
           ]}
         />
-        <YAxis hide domain={[0, maxEmissions * 1.25]} />
+        <YAxis hide domain={[0, maxEmissions * 1.5]} />
         <Area
           // fillOpacity={0.875}
           stackId="1"
