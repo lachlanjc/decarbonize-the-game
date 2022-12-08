@@ -113,7 +113,7 @@ const useGameState = create<State & Actions>()((set, get) => ({
   isGameOver: () =>
     get().year >= CONSTANTS.gameYearStart + CONSTANTS.gameYearSpan ||
     (get().getCurrentCapacity() <= get().capacityGoal - 1 &&
-      get().capacityLastHit <= get().year - 8),
+      get().capacityLastHit <= get().year - 9),
   // get().budget < 0,
 
   getCurrentCapacity: () => get().installed.length,

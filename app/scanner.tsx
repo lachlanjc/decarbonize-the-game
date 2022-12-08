@@ -15,7 +15,6 @@ type ScanType = {
   facingMode?: string
   constraints?: MediaTrackConstraints
   locator?: QuaggaJSConfigObject['locator']
-  numOfWorkers?: number
   decoders?: string[]
   locate?: boolean
   isPaused?: boolean
@@ -41,7 +40,6 @@ const useScan = ({
   facingMode = 'user',
   constraints = defaultConstraints,
   locator = defaultLocatorSettings,
-  numOfWorkers = navigator.hardwareConcurrency || 0,
   decoders = defaultDecoders,
   locate = true,
   isPaused = false,
@@ -74,7 +72,7 @@ const useScan = ({
           target: scannerRef?.current!,
         },
         locator,
-        numOfWorkers,
+        numOfWorkers: navigator.hardwareConcurrency,
         decoder: { readers: decoders },
         locate,
       },
@@ -117,14 +115,13 @@ export default function Scanner({ onPurchase }: { onPurchase: () => void }) {
   useScan({
     onDetected: (result) => {
       const key = result?.toLowerCase() as SourceName
+      const { year, installed } = gameState
       if (CONSTANTS.sourceNames.includes(key)) {
         console.log('RECOGNIZED', key)
         if (
-          gameState.year > CONSTANTS.gameYearStart + 6 &&
-          [gameState.year, gameState.year - 1].includes(
-            gameState.installed
-              .filter(({ source }) => source === key)
-              .reverse()[0]?.year
+          year > CONSTANTS.gameYearStart + 6 &&
+          [year, year - 1].includes(
+            installed.filter(({ source }) => source === key).reverse()[0]?.year
           )
         ) {
           console.log('source recently purchased, punting')
@@ -139,7 +136,7 @@ export default function Scanner({ onPurchase }: { onPurchase: () => void }) {
   })
 
   return (
-    <div className="absolute opacity-0 pointer-events-none" aria-hidden>
+    <div className="hidden" aria-hidden>
       <div ref={scannerRef} />
     </div>
   )
