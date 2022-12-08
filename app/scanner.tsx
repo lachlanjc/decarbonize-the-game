@@ -4,8 +4,8 @@ import type {
   QuaggaJSResultObject,
 } from '@ericblade/quagga2'
 import Quagga from '@ericblade/quagga2'
-import type { RefObject } from 'react'
-import { useCallback, useLayoutEffect } from 'react'
+import { useCallback, useLayoutEffect, useRef, type RefObject } from 'react'
+import useGameState, { CONSTANTS, type SourceName } from './state'
 
 type ScanType = {
   onDetected: (code: string) => void
@@ -111,4 +111,36 @@ const useScan = ({
   return
 }
 
-export default useScan
+export default function Scanner({ onPurchase }: { onPurchase: () => void }) {
+  const gameState = useGameState()
+  const scannerRef = useRef<HTMLDivElement>(null)
+  useScan({
+    onDetected: (result) => {
+      const key = result?.toLowerCase() as SourceName
+      if (CONSTANTS.sourceNames.includes(key)) {
+        console.log('RECOGNIZED', key)
+        if (
+          gameState.year > CONSTANTS.gameYearStart + 6 &&
+          [gameState.year, gameState.year - 1].includes(
+            gameState.installed
+              .filter(({ source }) => source === key)
+              .reverse()[0]?.year
+          )
+        ) {
+          console.log('source recently purchased, punting')
+        } else {
+          gameState.purchase(key)
+          onPurchase()
+        }
+      }
+    },
+    scannerRef,
+    isPaused: gameState.isGameOver(),
+  })
+
+  return (
+    <div className="absolute opacity-0 pointer-events-none" aria-hidden>
+      <div ref={scannerRef} />
+    </div>
+  )
+}

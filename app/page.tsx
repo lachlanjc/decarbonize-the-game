@@ -9,7 +9,9 @@ import { IconCoal, IconGas, IconWind, IconSolar } from './icons'
 import { ArrowRepeat, EmojiFrownFill } from 'react-bootstrap-icons'
 import useKeypress from 'react-use-keypress'
 import useSound from 'use-sound'
-import useScan from './use-scan'
+
+import dynamic from 'next/dynamic'
+const Scanner = dynamic(() => import('./scanner'), { ssr: false })
 
 const sourceIcons: Record<SourceName, ReactNode> = {
   solar: <IconSolar className="fill-amber-300" size={52} />,
@@ -20,8 +22,6 @@ const sourceIcons: Record<SourceName, ReactNode> = {
 
 function Page() {
   const gameState = useGameState()
-  const scannerRef = useRef<HTMLDivElement>(null)
-
   const isGameOver = gameState.isGameOver()
   // const currentCapacity = gameState.getCurrentCapacity()
   // const isCapacityOver =
@@ -56,30 +56,6 @@ function Page() {
   useKeypress('f', () => {
     gameState.purchase('gas')
     playPurchase()
-  })
-
-  useScan({
-    onDetected: (result) => {
-      const key = result?.toLowerCase()
-      if (Object.keys(sourceIcons).includes(key)) {
-        console.log('RECOGNIZED', key)
-        if (
-          gameState.year > CONSTANTS.gameYearStart + 6 &&
-          [gameState.year, gameState.year - 1].includes(
-            gameState.installed
-              .filter(({ source }) => source === key)
-              .reverse()[0]?.year
-          )
-        ) {
-          console.log('source recently purchased, punting')
-        } else {
-          gameState.purchase(key as SourceName)
-          playPurchase()
-        }
-      }
-    },
-    scannerRef,
-    isPaused: isGameOver,
   })
 
   return (
@@ -124,9 +100,8 @@ function Page() {
         )}{' '}
         tCO<sub>2</sub>
       </p>
-      <div className="absolute opacity-0 pointer-events-none" aria-hidden>
-        <div ref={scannerRef} />
-      </div>
+      <Scanner onPurchase={playPurchase} />
+
       {
         isGameOver ? (
           <>

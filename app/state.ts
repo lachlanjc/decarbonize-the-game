@@ -6,6 +6,7 @@ export const CONSTANTS = {
   gameYearStart: 2022,
   gameYearSpan: 50,
   maxInstalledSources: 14,
+  sourceNames: ['solar', 'wind', 'coal', 'gas'],
 } as const
 
 export type SourceName = 'solar' | 'wind' | 'coal' | 'gas'
