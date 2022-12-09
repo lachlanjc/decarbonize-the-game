@@ -1,6 +1,5 @@
 import create from 'zustand'
 import sum from 'lodash/sum'
-import groupBy from 'lodash/groupBy'
 
 export const CONSTANTS = {
   gameYearStart: 2022,
@@ -181,12 +180,6 @@ const useGameState = create<State & Actions>()((set, get) => ({
     }
   },
 
-  // decomission: (srcName: SourceName) => {
-  // const source = get().installed.find((src) => src.source === srcName)
-  // source.active = false
-  // set({ installed: get().installed.push(source) })
-  // },
-
   tickYear: () => {
     const { capacityGoal, capacityLastHit, isGameOver } = get()
     if (isGameOver()) return
@@ -194,14 +187,8 @@ const useGameState = create<State & Actions>()((set, get) => ({
     const priceLog = structuredClone(get().priceLog)
     priceLog[get().year] = get().getCurrentPrice()
 
-    // if (year === CONSTANTS.gameYearStart + 3) {
-    //   set({ inGameMessage: '' })
-    // }
-
     const emissionsLog = structuredClone(get().emissionsLog)
     emissionsLog[get().year] = get().getYearEmissions()
-    // const addlBudget =
-    // Math.min(...Object.values(sources).map((src) => src.price)) * 0.7
 
     const year = get().year + 1
     if (year === CONSTANTS.gameYearStart + CONSTANTS.gameYearSpan) {
@@ -212,7 +199,6 @@ const useGameState = create<State & Actions>()((set, get) => ({
       year,
       emissionsLog,
       priceLog,
-      // budget: budget + addlBudget,
     })
 
     if (get().getCurrentCapacity() <= capacityGoal) {
@@ -223,6 +209,9 @@ const useGameState = create<State & Actions>()((set, get) => ({
         })
       }
       if (year === CONSTANTS.gameYearStart + 6) {
+        set({ capacityLastHit: year })
+      }
+      if (year === CONSTANTS.gameYearStart + 6 + 8) {
         set({
           inGameMessage: {
             text: 'Install another source quickly!',
@@ -234,7 +223,7 @@ const useGameState = create<State & Actions>()((set, get) => ({
       set({ capacityLastHit: year })
     }
 
-    if (year % 6 === 0) {
+    if (year > CONSTANTS.gameYearStart + 6 && year % 6 === 0) {
       set({ capacityGoal: capacityGoal + 1 })
       if (get().installed.length === initialState.installed.length) {
         set({

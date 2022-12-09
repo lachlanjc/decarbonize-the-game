@@ -1,13 +1,15 @@
 'use client'
 
-import { ReactNode, useEffect } from 'react'
-import useGameState, { type SourceName } from './state'
+import { useEffect } from 'react'
+import useGameState, { CONSTANTS } from './state'
 import EmissionsChart from './emissions-chart'
 import PriceChart from './price-chart'
 import Board from './board'
 import { IconCoal, IconGas, IconWind, IconSolar } from './icons'
 import {
+  ArrowLeft,
   ArrowRepeat,
+  ChevronLeft,
   EmojiFrownFill,
   LightningCharge,
   ThermometerHalf,
@@ -17,13 +19,6 @@ import useSound from 'use-sound'
 
 import dynamic from 'next/dynamic'
 const Scanner = dynamic(() => import('./scanner'), { ssr: false })
-
-const sourceIcons: Record<SourceName, ReactNode> = {
-  solar: <IconSolar className="fill-amber-300" size={52} />,
-  wind: <IconWind className="fill-white" size={52} />,
-  coal: <IconCoal className="fill-black" size={52} />,
-  gas: <IconGas className="fill-gray-800" size={52} />,
-}
 
 function Page() {
   const gameState = useGameState()
@@ -100,7 +95,7 @@ function Page() {
         aria-live="assertive"
         aria-hidden={
           isGameOver ||
-          gameState.inGameMessage.lastUpdated <= gameState.year - 1
+          gameState.inGameMessage.lastUpdated <= gameState.year - 2
         }
       >
         {gameState.inGameMessage.text}
@@ -126,7 +121,17 @@ function Page() {
               <p className="text-2xl">{gameState.endGameMessage}</p>
             </nav>
           </>
-        ) : null
+        ) : (
+          <ChevronLeft
+            size={48}
+            className={`absolute top-1/2 -translate-y-1/2 left-4 ${
+              gameState.year > CONSTANTS.gameYearStart + 5 &&
+              gameState.year < CONSTANTS.gameYearStart + 18
+                ? 'opacity-100'
+                : 'opacity-0'
+            } transition-opacity`}
+          />
+        )
         /*
         <nav className="absolute bottom-8 py-5 px-8 shadow-dock rounded-2xl backdrop-blur-sm bg-white/50 text-black flex flex-col items-center gap-3">
           <div
