@@ -28,7 +28,7 @@ function Page() {
   //   currentCapacity >= gameState.capacityGoal &&
   //   gameState.capacityLastHit <= gameState.year - 5
 
-  const [playPurchase] = useSound('/sounds/bite.mp3', { volume: 0.875 })
+  const [playPurchase] = useSound('/sounds/bite.mp3')
 
   useEffect(() => {
     const yearTicker = setInterval(() => gameState.tickYear(), 1500)
