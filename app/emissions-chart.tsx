@@ -43,8 +43,6 @@ function EmissionsChart({ emissions = {} }: { emissions: Data }) {
           hide
           dataKey="year"
           label="Year"
-          // type="number"
-          // ticks={Object.keys(emissions)}
           domain={[
             CONSTANTS.gameYearStart,
             CONSTANTS.gameYearStart + CONSTANTS.gameYearSpan,
@@ -52,11 +50,8 @@ function EmissionsChart({ emissions = {} }: { emissions: Data }) {
         />
         <YAxis hide domain={[0, maxEmissions * 1.5]} />
         <Area
-          // fillOpacity={0.875}
-          stackId="1"
-          type="monotone"
+          type="basis"
           dataKey="value"
-          // className='fill-white'
           fill="white"
           fillOpacity={0.25}
           stroke="none"

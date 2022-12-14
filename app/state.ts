@@ -4,7 +4,7 @@ import sum from 'lodash/sum'
 export const CONSTANTS = {
   gameYearStart: 2022,
   gameYearSpan: 50,
-  maxInstalledSources: 14,
+  // maxInstalledSources: 14,
   sourceNames: ['solar', 'wind', 'coal', 'gas'],
 } as const
 
@@ -16,7 +16,8 @@ interface Source {
   // MWh
   // capacity: number
   // total tCO2e/year
-  co2Rate: number
+  installCO2: number
+  yearlyCO2: number
   // Whether it’s active or decommissioned
   // active: boolean
   // Number of squares on the board it takes up
@@ -75,14 +76,16 @@ const initialState: State = {
     {
       source: 'coal',
       price: 0,
-      co2Rate: 25,
+      installCO2: 0.5,
+      yearlyCO2: 102,
       size: 1,
       year: CONSTANTS.gameYearStart,
     },
     {
       source: 'gas',
       price: 0,
-      co2Rate: 15,
+      installCO2: 0.08,
+      yearlyCO2: 46,
       size: 1,
       year: CONSTANTS.gameYearStart,
     },
@@ -90,16 +93,17 @@ const initialState: State = {
     {
       source: 'wind',
       price: 0,
-      co2Rate: 0,
+      installCO2: 1.2,
+      yearlyCO2: 0.074,
       size: 2,
       year: CONSTANTS.gameYearStart,
     },
   ],
   sources: {
-    solar: { price: 83, co2Rate: 0, size: 2 },
-    wind: { price: 160, co2Rate: 0, size: 2 },
-    coal: { price: 350, co2Rate: 22.6, size: 1 },
-    gas: { price: 100, co2Rate: 9.7, size: 1 },
+    solar: { price: 83, installCO2: 2.8, yearlyCO2: 1, size: 2 },
+    wind: { price: 160, installCO2: 1.2, yearlyCO2: 0.074, size: 2 },
+    coal: { price: 350, installCO2: 0.5, yearlyCO2: 102, size: 1 },
+    gas: { price: 100, installCO2: 0.08, yearlyCO2: 46, size: 1 },
   },
   emissionsLog: getInitialLog(),
   priceLog: getInitialLog(),
@@ -130,7 +134,15 @@ const useGameState = create<State & Actions>()((set, get) => ({
     return yearMultiplier * unmetDemandMultiplier
   },
 
-  getYearEmissions: () => sum(get().installed.map((source) => source.co2Rate)),
+  getYearEmissions: () => {
+    const yearly = sum(get().installed.map((source) => source.yearlyCO2))
+    const installation = sum(
+      get()
+        .installed.filter((src) => src.year === get().year)
+        .map((src) => src.installCO2)
+    )
+    return yearly + installation
+  },
 
   getLifetimeEmissions: () => sum(Object.values(get().emissionsLog)),
 

@@ -28,7 +28,7 @@ function Board({
   }, [addlCapacity])
 
   return (
-    <div className="grid grid-cols-4 grid-rows-4 grid-flow-dense gap-2 bg-sky-700 p-2 rounded-xl shadow-dock absolute top-8 right-8 [min-height:296px]">
+    <div className="grid grid-cols-4 grid-rows-4 grid-flow-dense gap-2 bg-sky-700 p-2 rounded-xl shadow-xl absolute top-8 right-8 [min-height:296px]">
       {installed.map(({ source, price, size }, i) => (
         <div
           key={`${source}${price}${i}`}
