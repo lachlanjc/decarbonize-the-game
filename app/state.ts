@@ -48,6 +48,7 @@ type Actions = {
   tickYear: () => void
   endGame: () => void
   isGameOver: () => boolean
+  isGameOverFromCapacity: () => boolean
   getCurrentCapacity: () => number
   getCurrentPrice: () => number
   getYearEmissions: () => number
@@ -107,9 +108,12 @@ const useGameState = create<State & Actions>()((set, get) => ({
 
   isGameOver: () =>
     get().year >= CONSTANTS.gameYearStart + CONSTANTS.gameYearSpan ||
-    (get().getCurrentCapacity() <= get().capacityGoal - 1 &&
-      get().capacityLastHit <= get().year - 9),
+    get().isGameOverFromCapacity(),
   // get().budget < 0,
+
+  isGameOverFromCapacity: () =>
+    get().getCurrentCapacity() <= get().capacityGoal - 1 &&
+    get().capacityLastHit <= get().year - 9,
 
   getCurrentCapacity: () => get().installed.length,
 

@@ -9,6 +9,7 @@ import { IconCoal, IconGas, IconWind, IconSolar } from './icons'
 import {
   ArrowLeft,
   ArrowRepeat,
+  CheckCircleFill,
   ChevronLeft,
   EmojiFrownFill,
   LightningCharge,
@@ -60,9 +61,8 @@ function Page() {
 
   return (
     <main
-      className={`flex full-width min-h-screen flex-col relative transition-colors ${
-        isGameOver ? 'bg-black' : 'bg-sky-500'
-      } text-white p-12`}
+      className={`flex full-width min-h-screen flex-col relative transition-colors ${isGameOver ? 'bg-black' : 'bg-sky-500'
+        } text-white p-12`}
     >
       <EmissionsChart emissions={gameState.emissionsLog} />
       <PriceChart prices={gameState.priceLog} />
@@ -114,9 +114,18 @@ function Page() {
               <ArrowRepeat size={64} className="fill-sky-500" />
             </button>
             <nav className="mt-auto mx-auto mb-6 py-5 px-8 shadow-dock rounded-2xl backdrop-blur-lg bg-black/25 text-white text-center">
-              <p className="font-bold text-red-400 mb-3 flex items-center justify-center gap-3 uppercase">
-                <EmojiFrownFill size={24} />
-                Game over
+              <p className={`font-bold ${gameState.isGameOverFromCapacity() ? 'text-red-400' : 'text-green-400'} mb-3 flex items-center justify-center gap-3 uppercase`}>
+                {gameState.isGameOverFromCapacity() ?
+                  <>
+                    <EmojiFrownFill size={24} />
+                    Game over
+                  </>
+                  :
+                  <>
+                    <CheckCircleFill size={24} />
+                    Game ended
+                  </>
+                }
               </p>
               <p className="text-2xl">{gameState.endGameMessage}</p>
             </nav>
@@ -124,12 +133,11 @@ function Page() {
         ) : (
           <ChevronLeft
             size={48}
-            className={`absolute top-1/2 -translate-y-1/2 left-4 ${
-              gameState.year > CONSTANTS.gameYearStart + 5 &&
+            className={`absolute top-1/2 -translate-y-1/2 left-4 ${gameState.year > CONSTANTS.gameYearStart + 5 &&
               gameState.year < CONSTANTS.gameYearStart + 18
-                ? 'opacity-100'
-                : 'opacity-0'
-            } transition-opacity`}
+              ? ''
+              : 'opacity-0'
+              } transition-opacity pulse`}
           />
         )
         /*
