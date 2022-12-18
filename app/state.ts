@@ -2,7 +2,7 @@ import create from 'zustand'
 import sum from 'lodash/sum'
 
 export const CONSTANTS = {
-  gameYearStart: 2022,
+  gameYearStart: 2000,
   gameYearSpan: 50,
   // maxInstalledSources: 14,
   sourceNames: ['solar', 'wind', 'coal', 'gas'],
@@ -72,14 +72,18 @@ const getInitialLog = () =>
     .reduce((acc, year) => ({ ...acc, [year]: null }), {})
 
 const SOURCES = {
-  solar: { price: 83, installCO2: 2.8, yearlyCO2: 1, size: 2 },
-  wind: { price: 160, installCO2: 1.2, yearlyCO2: 0.074, size: 2 },
-  coal: { price: 350, installCO2: 0.5, yearlyCO2: 102, size: 1 },
-  gas: { price: 100, installCO2: 0.08, yearlyCO2: 46, size: 1 },
+  solar: { price: 4, installCO2: 2.8, yearlyCO2: 1, size: 2 },
+  wind: { price: 3, installCO2: 1.2, yearlyCO2: 0.074, size: 2 },
+  coal: { price: 1, installCO2: 0.5, yearlyCO2: 102, size: 1 },
+  gas: { price: 1.25, installCO2: 0.08, yearlyCO2: 46, size: 1 },
 } as const
 
+function getRandomBetween(min, max) {
+  return Math.random() * (max - min) + min
+}
+
 const initialState: State = {
-  year: 2022,
+  year: CONSTANTS.gameYearStart,
   capacityGoal: 3,
   capacityLastHit: CONSTANTS.gameYearStart,
   inGameMessage: {
@@ -125,24 +129,56 @@ const useGameState = create<State & Actions>()((set, get) => ({
   getCurrentCapacity: () => get().installed.length,
 
   getCurrentPrice: () => {
-    const { installed, year } = get()
+    const { installed, year, getCurrentCapacity } = get()
 
-    const yearMultiplier =
-      2 + (year - CONSTANTS.gameYearStart) / CONSTANTS.gameYearSpan
-    // const installedCoal = installed.filter((src) => src.source === 'coal')
-    // installedCoal.length *
+    const currentCapacity = getCurrentCapacity()
+    const yearsIntoGame = year - CONSTANTS.gameYearStart
+
+    const coalInstalled = installed.filter((src) => src.source === 'coal')
+    const coalPriceCurrent =
+      SOURCES.coal.price + yearsIntoGame * getRandomBetween(0.1, 0.125)
+    const coalPercent = coalInstalled.length / currentCapacity
+
+    const gasInstalled = installed.filter((src) => src.source === 'gas')
+    const gasPriceCurrent =
+      SOURCES.gas.price + yearsIntoGame * getRandomBetween(0.2, 0.25)
+    const gasPercent = gasInstalled.length / currentCapacity
+
+    const solarInstalled = installed.filter((src) => src.source === 'solar')
+    const solarPriceCurrent = 1.11 ** (-yearsIntoGame + CONSTANTS.gameYearSpan)
+    const solarPercent = solarInstalled.length / currentCapacity
+
+    const windInstalled = installed.filter((src) => src.source === 'wind')
+    const windPriceCurrent = 1.0625 ** (-yearsIntoGame + CONSTANTS.gameYearSpan)
+    const windPercent = windInstalled.length / currentCapacity
+
+    const generationSourcePrice =
+      coalPercent * coalPriceCurrent +
+      gasPercent * gasPriceCurrent +
+      solarPercent * solarPriceCurrent +
+      windPercent * windPriceCurrent
+
+    // console.log({
+    //   coalPriceCurrent,
+    //   gasPriceCurrent,
+    //   solarPriceCurrent,
+    //   windPriceCurrent,
+    // })
 
     const unmetDemandMultiplier = get().capacityGoal / installed.length
 
-    return yearMultiplier * unmetDemandMultiplier
+    return Math.max(
+      0.01,
+      (generationSourcePrice / 16.5) * unmetDemandMultiplier
+    )
   },
 
   getCurrentPriceComparison: () => {
     const CURRENT_NYC_ELECTRICITY_PRICE = 0.16
     const value = get().getCurrentPrice() / CURRENT_NYC_ELECTRICITY_PRICE
-    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(
-      value
-    )
+    return new Intl.NumberFormat('en-US', {
+      maximumFractionDigits: value < 1 ? 1 : 0,
+    }).format(value)
   },
 
   getYearEmissions: () => {
@@ -203,32 +239,9 @@ const useGameState = create<State & Actions>()((set, get) => ({
   purchase: (srcName: SourceName) => {
     const { sources, year, capacityGoal } = get()
 
-    // if (get().installed.length >= CONSTANTS.maxInstalledSources) {
-    //   return set({
-    //     inGameMessage: { text: 'The board is full.', lastUpdated: year },
-    //   })
-    // }
-
     const source = structuredClone(sources[srcName]) as Source
     source.source = srcName
     source.year = year
-    // source.active = true
-
-    // set(({ budget }) => ({ budget: budget - source.price }))
-
-    if (srcName === 'solar') {
-      const capacity = get().getLifetimeCapacityOfSource('solar')
-      const scaleFactor = capacity === 1 || capacity % 2 === 1 ? 0.8 : 1
-      const price = sources.solar.price * scaleFactor
-      set({ sources: { ...sources, solar: { ...sources.solar, price } } })
-    }
-    // TODO wind learning curve
-    if (srcName === 'wind') {
-      const capacity = get().getLifetimeCapacityOfSource('wind')
-      const scaleFactor = capacity === 1 || capacity % 2 === 1 ? 0.8 : 1
-      const price = sources.wind.price * scaleFactor
-      set({ sources: { ...sources, wind: { ...sources.wind, price } } })
-    }
 
     set(({ installed }) => ({
       installed: [...installed, source],

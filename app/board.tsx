@@ -33,7 +33,7 @@ function Board({
         <div
           key={`${source}${price}${i}`}
           title={source}
-          className={`bg-sky-400 rounded-lg p-2 flex flex-col items-center justify-center group ${source === 'wind' ? 'row-span-2' : `col-span-${size}`
+          className={`bg-sky-400 rounded-lg p-2 flex flex-col items-center justify-center group ${source === 'wind' ? 'row-span-2 [aspect-ratio:8_/_17]' : `col-span-${size}`
             }`}
         >
           {sourceIcons[source]}

@@ -15,9 +15,8 @@ function PriceChart({ prices = {} }: { prices: Data }) {
       height="100%"
       minHeight={1024}
       minWidth={768}
-      className={`absolute inset-0 pointer-events-none transition-opacity ${
-        data.length < 4 ? 'opacity-0' : 'opacity-100'
-      }`}
+      className={`absolute inset-0 pointer-events-none transition-opacity ${data.length < 4 ? 'opacity-0' : 'opacity-100'
+        }`}
     >
       <LineChart
         data={data}
@@ -41,9 +40,7 @@ function PriceChart({ prices = {} }: { prices: Data }) {
         />
         <YAxis hide domain={[0, maxPrice * 1.5]} />
         <Line
-          // fillOpacity={0.875}
           dataKey="value"
-          // className='fill-white'
           stroke="white"
           strokeWidth={4}
           type="step"
