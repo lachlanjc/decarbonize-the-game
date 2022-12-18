@@ -78,7 +78,7 @@ const SOURCES = {
   gas: { price: 1.25, installCO2: 0.08, yearlyCO2: 46, size: 1 },
 } as const
 
-function getRandomBetween(min, max) {
+function getRandomBetween(min: number, max: number) {
   return Math.random() * (max - min) + min
 }
 
@@ -212,6 +212,7 @@ const useGameState = create<State & Actions>()((set, get) => ({
       'Rhode Island': 776_900,
       'Hong Kong': 273_000,
       'San Francisco': 30_000,
+      Manhattan: 14_600,
       'Central Park': 843,
       'Vatican City': 109,
       'an American football field': 1.32,
