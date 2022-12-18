@@ -43,7 +43,12 @@ export type State = {
   readonly priceLog: Record<number, number>
 }
 
-type Actions = {
+export interface LifetimeEmissionsSummary {
+  totalCost: number
+  landEquivalency: string
+}
+
+export type Actions = {
   reset: () => void
   tickYear: () => void
   endGame: () => void
@@ -51,9 +56,11 @@ type Actions = {
   isGameOverFromCapacity: () => boolean
   getCurrentCapacity: () => number
   getCurrentPrice: () => number
+  getCurrentPriceComparison: () => string
   getYearEmissions: () => number
   getLifetimeEmissions: () => number
   getLifetimeCapacityOfSource: (src: SourceName) => number
+  getLifetimeEmissionsSummary: () => LifetimeEmissionsSummary
   purchase: (src: SourceName) => void
   // decomission: (src: SourceName) => void
 }
@@ -130,6 +137,14 @@ const useGameState = create<State & Actions>()((set, get) => ({
     return yearMultiplier * unmetDemandMultiplier
   },
 
+  getCurrentPriceComparison: () => {
+    const CURRENT_NYC_ELECTRICITY_PRICE = 0.16
+    const value = get().getCurrentPrice() / CURRENT_NYC_ELECTRICITY_PRICE
+    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(
+      value
+    )
+  },
+
   getYearEmissions: () => {
     const yearly = sum(get().installed.map((source) => source.yearlyCO2))
     const installation = sum(
@@ -145,8 +160,48 @@ const useGameState = create<State & Actions>()((set, get) => ({
   getLifetimeCapacityOfSource: (srcName: SourceName) =>
     get().installed.filter((src) => src.source === srcName).length,
 
+  getLifetimeEmissionsSummary: () => {
+    const tCO2e = get().getLifetimeEmissions()
+    const REFORESTATION_DOLLARS_PER_TONNE = 50
+    const totalCost = REFORESTATION_DOLLARS_PER_TONNE * tCO2e
+
+    const tonnesPerAcre = 2.5
+    const acresPerTonne = 1 / tonnesPerAcre
+    const acresCovered = tCO2e / acresPerTonne
+
+    const areaEquivalencyData: Record<string, number> = {
+      France: 156_352_000,
+      Pennsylvania: 29_475_000,
+      Connecticut: 3_548_000,
+      'Rhode Island': 776_900,
+      'Hong Kong': 273_000,
+      'San Francisco': 30_000,
+      'Central Park': 843,
+      'Vatican City': 109,
+      'an American football field': 1.32,
+    }
+
+    const areaEquivalencies = Object.values(areaEquivalencyData).map(
+      (equivalencyAcres) => Math.round(acresCovered / equivalencyAcres)
+    )
+    const equivalencyIndex = areaEquivalencies.indexOf(
+      areaEquivalencies.filter((equiv) => equiv >= 1).sort()[0] ??
+        areaEquivalencies[0]
+    )
+    const equivalencyNumber = areaEquivalencies[equivalencyIndex]
+    const equivalencyValue = Object.keys(areaEquivalencyData)[equivalencyIndex]
+    const landEquivalency =
+      equivalencyNumber === 1
+        ? `around the size of ${equivalencyValue}`
+        : `${new Intl.NumberFormat('en-US', {
+            maximumFractionDigits: 0,
+          }).format(equivalencyNumber)}x larger than ${equivalencyValue}`
+
+    return { totalCost, landEquivalency }
+  },
+
   purchase: (srcName: SourceName) => {
-    const { sources, year } = get()
+    const { sources, year, capacityGoal } = get()
 
     // if (get().installed.length >= CONSTANTS.maxInstalledSources) {
     //   return set({
@@ -179,10 +234,17 @@ const useGameState = create<State & Actions>()((set, get) => ({
       installed: [...installed, source],
     }))
 
-    if (get().getCurrentCapacity() >= get().capacityGoal) {
+    const currentCapacity = get().getCurrentCapacity()
+    if (currentCapacity >= capacityGoal) {
       set({
         capacityLastHit: year,
-        inGameMessage: { text: 'Nice, hit the capacity.', lastUpdated: year },
+        inGameMessage: {
+          text:
+            currentCapacity > capacityGoal
+              ? 'You’ve installed extra capacity.'
+              : 'Nice, you fulfilled demand.',
+          lastUpdated: year,
+        },
         endGameMessage: '',
       })
     }
