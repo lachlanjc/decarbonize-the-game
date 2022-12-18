@@ -63,6 +63,13 @@ const getInitialLog = () =>
     .map((zero, i) => CONSTANTS.gameYearStart + i)
     .reduce((acc, year) => ({ ...acc, [year]: null }), {})
 
+const SOURCES = {
+  solar: { price: 83, installCO2: 2.8, yearlyCO2: 1, size: 2 },
+  wind: { price: 160, installCO2: 1.2, yearlyCO2: 0.074, size: 2 },
+  coal: { price: 350, installCO2: 0.5, yearlyCO2: 102, size: 1 },
+  gas: { price: 100, installCO2: 0.08, yearlyCO2: 46, size: 1 },
+} as const
+
 const initialState: State = {
   year: 2022,
   capacityGoal: 3,
@@ -74,37 +81,22 @@ const initialState: State = {
   endGameMessage: '',
   installed: [
     {
-      source: 'coal',
-      price: 0,
-      installCO2: 0.5,
-      yearlyCO2: 102,
-      size: 1,
-      year: CONSTANTS.gameYearStart,
-    },
-    {
-      source: 'gas',
-      price: 0,
-      installCO2: 0.08,
-      yearlyCO2: 46,
-      size: 1,
-      year: CONSTANTS.gameYearStart,
-    },
-    // { source: 'gas', price: 0, co2Rate: 15, year: CONSTANTS.gameYearStart },
-    {
+      ...SOURCES.wind,
       source: 'wind',
-      price: 0,
-      installCO2: 1.2,
-      yearlyCO2: 0.074,
-      size: 2,
+      year: CONSTANTS.gameYearStart,
+    },
+    {
+      ...SOURCES.coal,
+      source: 'coal',
+      year: CONSTANTS.gameYearStart,
+    },
+    {
+      ...SOURCES.gas,
+      source: 'gas',
       year: CONSTANTS.gameYearStart,
     },
   ],
-  sources: {
-    solar: { price: 83, installCO2: 2.8, yearlyCO2: 1, size: 2 },
-    wind: { price: 160, installCO2: 1.2, yearlyCO2: 0.074, size: 2 },
-    coal: { price: 350, installCO2: 0.5, yearlyCO2: 102, size: 1 },
-    gas: { price: 100, installCO2: 0.08, yearlyCO2: 46, size: 1 },
-  },
+  sources: SOURCES,
   emissionsLog: getInitialLog(),
   priceLog: getInitialLog(),
 }
