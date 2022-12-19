@@ -75,7 +75,6 @@ const useScan = ({
         numOfWorkers: navigator.hardwareConcurrency,
         decoder: { readers: decoders },
         locate,
-        frequency: 120
       },
       (err) => {
         if (err) {
