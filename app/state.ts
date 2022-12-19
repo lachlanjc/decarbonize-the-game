@@ -62,7 +62,6 @@ export type Actions = {
   getLifetimeCapacityOfSource: (src: SourceName) => number
   getLifetimeEmissionsSummary: () => LifetimeEmissionsSummary
   purchase: (src: SourceName) => void
-  // decomission: (src: SourceName) => void
 }
 
 const getInitialLog = () =>
@@ -124,7 +123,7 @@ const useGameState = create<State & Actions>()((set, get) => ({
 
   isGameOverFromCapacity: () =>
     get().getCurrentCapacity() <= get().capacityGoal - 1 &&
-    get().capacityLastHit <= get().year - 9,
+    get().capacityLastHit <= get().year - 10,
 
   getCurrentCapacity: () => get().installed.length,
 

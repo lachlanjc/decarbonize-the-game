@@ -120,7 +120,7 @@ export default function Scanner({ onPurchase }: { onPurchase: () => void }) {
         console.log('RECOGNIZED', key)
         if (
           year > CONSTANTS.gameYearStart + 6 &&
-          [year, year - 1, year - 2].includes(
+          [year, year - 1, year - 2, year - 3].includes(
             installed.filter(({ source }) => source === key).reverse()[0]?.year
           )
         ) {

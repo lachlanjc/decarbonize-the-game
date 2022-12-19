@@ -31,7 +31,7 @@ function Page() {
   const [playPurchase] = useSound('/sounds/bite.mp3')
 
   useEffect(() => {
-    const yearTicker = setInterval(() => gameState.tickYear(), 1500)
+    const yearTicker = setInterval(() => gameState.tickYear(), 1750)
 
     return () => {
       clearInterval(yearTicker)
