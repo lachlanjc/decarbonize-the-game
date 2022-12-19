@@ -122,8 +122,8 @@ const useGameState = create<State & Actions>()((set, get) => ({
   // get().budget < 0,
 
   isGameOverFromCapacity: () =>
-    get().getCurrentCapacity() <= get().capacityGoal - 1 &&
-    get().capacityLastHit <= get().year - 10,
+    get().getCurrentCapacity() <= get().capacityGoal - 2 &&
+    get().capacityLastHit <= get().year - 15,
 
   getCurrentCapacity: () => get().installed.length,
 
@@ -335,7 +335,7 @@ const useGameState = create<State & Actions>()((set, get) => ({
   },
 
   endGame: () => {
-    set({ endGameMessage: 'Game ended.', year: 2100 })
+    set({ endGameMessage: 'Game ended.', year: 2051 })
   },
 
   reset: () => {
