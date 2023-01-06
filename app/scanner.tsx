@@ -15,7 +15,7 @@ type ScanType = {
   facingMode?: string
   constraints?: MediaTrackConstraints
   locator?: QuaggaJSConfigObject['locator']
-  decoders?: string[]
+  decoder?: QuaggaJSConfigObject['decoder']
   locate?: boolean
   isPaused?: boolean
 }
@@ -30,7 +30,7 @@ const defaultLocatorSettings = {
   halfSample: true,
 }
 
-const defaultDecoders = ['code_39_reader']
+const defaultDecoder = { readers: ['code_39_reader'] } as ScanType['decoder']
 
 const useScan = ({
   onDetected,
@@ -40,7 +40,7 @@ const useScan = ({
   facingMode = 'user',
   constraints = defaultConstraints,
   locator = defaultLocatorSettings,
-  decoders = defaultDecoders,
+  decoder = defaultDecoder,
   locate = true,
   isPaused = false,
 }: ScanType) => {
@@ -73,7 +73,7 @@ const useScan = ({
         },
         locator,
         numOfWorkers: navigator.hardwareConcurrency,
-        decoder: { readers: decoders },
+        decoder,
         locate,
       },
       (err) => {
@@ -101,7 +101,7 @@ const useScan = ({
     errorCheck,
     constraints,
     locator,
-    decoders,
+    decoder,
     locate,
     isPaused,
   ])
