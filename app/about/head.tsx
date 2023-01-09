@@ -1,6 +1,7 @@
 export default function Head() {
   return (
     <>
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
       <meta property="og:title" content="Decarbonize: The Game" />
       <meta property="og:type" content="website" />
       <meta property="og:description" content="Interactive board game about decarbonizing the US electricity grid, made by Lachlan Campbell." />
