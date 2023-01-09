@@ -69,11 +69,11 @@ export default function AboutPage() {
           <h1 className="font-bold text-4xl md:text-5xl mt-4">
             Decarbonize: The&nbsp;Game
           </h1>
-          <p className="text-zinc-600 dark:text-zinc-300 text-lg font-mono mt-4">
+          <p className="text-zinc-600 dark:text-zinc-400 text-lg font-mono mt-4">
             A project by{' '}
             <a
               href="https://lachlanjc.com"
-              className="text-sky-600 bg-sky-100 hover:bg-sky-200 focus:bg-sky-200 transition-colors px-1 rounded-md"
+              className="text-sky-600 bg-sky-400 bg-opacity-20 hover:bg-opacity-30 focus:bg-opacity-30 transition-colors px-1 rounded-md"
             >
               @lachlanjc
             </a>
@@ -116,7 +116,16 @@ export default function AboutPage() {
             and <a className="underline" href="https://github.com/ericblade/quagga2">quagga2</a>.
           </p>
           <Video />
-          <div className='grid sm:grid-cols-2 gap-8'>
+          <p className="text-zinc-600 dark:text-zinc-400 md:text-right text-sm -mt-4">
+            Video by{' '}
+            <a
+              href="https://www.matthewstanciu.me"
+              className="text-sky-500 font-bold"
+            >
+              Matthew Stanciu
+            </a>
+          </p>
+          <div className="grid sm:grid-cols-2 gap-8">
             <a
               href="https://github.com/lachlanjc/decarbonize-the-game/"
               className="inline-block text-center rounded-full border-2 border-transparent bg-pink-400 hover:bg-pink-500 transition-colors px-4 py-2 text-lg font-bold text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
@@ -135,8 +144,9 @@ export default function AboutPage() {
               Playing without the pieces
             </h2>
             <p className="text-sky-800 dark:text-sky-200 font-mono mb-4">
-              Use keyboard shortcuts instead of the camera scanning to purchase
-              additional energy sources:{' '}
+              You can open the game yourself; use keyboard shortcuts instead of
+              the camera scanning to purchase additional energy sources:
+              <br />
               <kbd className="bg-white text-sky-600 font-mono px-2 rounded-md">a</kbd>{' '}
               (solar),{' '}
               <kbd className="bg-white text-sky-600 font-mono px-2 rounded-md">s</kbd>{' '}
